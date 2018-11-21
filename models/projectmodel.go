@@ -9,6 +9,6 @@ type (
 		Name    string `json:"name"`
 		Content string `json:"content"`
 		User    User
-		UserId  int `json:"userId`
+		UserID  int `json:"userID"`
 	}
 )

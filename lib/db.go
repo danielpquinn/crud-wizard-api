@@ -20,4 +20,5 @@ func InitializeDatabase() {
 	Database.LogMode(true)
 	Database.AutoMigrate(&models.User{})
 	Database.AutoMigrate(&models.Project{})
+	Database.AutoMigrate(&models.AuthToken{})
 }

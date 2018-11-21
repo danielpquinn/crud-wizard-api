@@ -1,0 +1,5 @@
+{
+  "ClientID": "",
+  "ClientSecret": "",
+  "RedirectURL": "http://localhost:8080/auth"
+}

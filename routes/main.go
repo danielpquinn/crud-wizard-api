@@ -1,6 +1,9 @@
 package routes
 
 import (
+	"github.com/danielpquinn/crud-wizard-projects/middleware"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -8,14 +11,23 @@ import (
 func Initialize() {
 	router := gin.Default()
 
-	v1 := router.Group("api/v1/projects")
-	{
-		v1.GET("/", ListProjects)
-		v1.GET("/:id", GetProject)
-		v1.POST("/", CreateProject)
-		v1.PUT("/:id", UpdateProject)
-		v1.DELETE("/:id", DeleteProject)
-	}
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
+
+	router.LoadHTMLGlob("templates/*")
+
+	projects := router.Group("api/v1/projects")
+	projects.Use(middleware.Authenticate)
+	projects.GET("/", ListProjects)
+	projects.GET("/:id", GetProject)
+	projects.POST("/", CreateProject)
+	projects.PUT("/:id", UpdateProject)
+	projects.DELETE("/:id", DeleteProject)
+
+	router.GET("/", GetIndex)
+
+	router.GET("/login", GetLogin)
+	router.GET("/auth", GetAuth)
 
 	router.Run()
 }
