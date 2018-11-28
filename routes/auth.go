@@ -3,6 +3,7 @@ package routes
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,11 +12,12 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/danielpquinn/crud-wizard-projects/lib"
+	"github.com/danielpquinn/crud-wizard-projects/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-func randToken() string {
+func getToken() string {
 	b := make([]byte, 32)
 	rand.Read(b)
 	return base64.StdEncoding.EncodeToString(b)
@@ -27,7 +29,7 @@ func getLoginURL(state string) string {
 
 // GetLogin renders the login page
 func GetLogin(c *gin.Context) {
-	state := randToken()
+	state := getToken()
 	session := sessions.Default(c)
 	session.Set("state", state)
 	session.Save()
@@ -65,5 +67,31 @@ func GetAuth(c *gin.Context) {
 
 	log.Println("User info body: ", string(body))
 
-	c.Status(http.StatusOK)
+	var authenticatedUser models.User
+
+	json.Unmarshal(body, &authenticatedUser)
+
+	log.Println(string(authenticatedUser.Email))
+
+	var user models.User
+
+	lib.Database.Where("email = ?", user.Email).First(&user)
+
+	if user.ID == 0 {
+		user := models.User{
+			Email: authenticatedUser.Email,
+		}
+		lib.Database.Create(&user)
+	}
+
+	tokenString := string(getToken())
+
+	authToken := models.AuthToken{
+		Value: tokenString,
+		User:  user,
+	}
+
+	lib.Database.Create(&authToken)
+
+	c.Redirect(http.StatusTemporaryRedirect, "/?token="+tokenString)
 }
