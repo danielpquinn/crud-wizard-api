@@ -10,6 +10,14 @@
   version = "v0.33.1"
 
 [[projects]]
+  digest = "1:2b59aca2665ff804f6606c8829eaee133ddd3aefbc841014660d961b0034f888"
+  name = "github.com/gin-contrib/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cf4846e6a636a76237a28d9286f163c132e841bc"
+  version = "v1.2"
+
+[[projects]]
   branch = "master"
   digest = "1:cd203a28422630fedc57966b90b6e39ff38b4c553bee2282c9032f41ba7a0e3e"
   name = "github.com/gin-contrib/sessions"
@@ -216,6 +224,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/gin-contrib/cors",
     "github.com/gin-contrib/sessions",
     "github.com/gin-contrib/sessions/cookie",
     "github.com/gin-gonic/gin",

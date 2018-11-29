@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/danielpquinn/crud-wizard-projects/middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ func Initialize() {
 
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
+	router.Use(cors.Default())
 
 	router.LoadHTMLGlob("templates/*")
 
@@ -28,6 +30,8 @@ func Initialize() {
 
 	router.GET("/login", GetLogin)
 	router.GET("/auth", GetAuth)
+
+	router.NoRoute(NoRoute)
 
 	router.Run()
 }
