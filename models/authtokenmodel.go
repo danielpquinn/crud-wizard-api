@@ -1,14 +1,11 @@
 package models
 
-import "github.com/jinzhu/gorm"
-
 type (
 
 	// AuthToken struct
 	AuthToken struct {
-		gorm.Model
-		Value  string
-		User   User
-		UserID int `json:"userID"`
+		ID     uint   `gorm:"primary_key" json:"id"`
+		Value  string `json:"value"`
+		UserID uint
 	}
 )

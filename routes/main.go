@@ -14,7 +14,11 @@ func Initialize() {
 
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
-	router.Use(cors.Default())
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Authorization", "Content-Type"}
+	config.AllowMethods = []string{"GET", "PUT", "POST", "DELETE"}
+	router.Use(cors.New(config))
 
 	router.LoadHTMLGlob("templates/*")
 
@@ -26,10 +30,11 @@ func Initialize() {
 	projects.PUT("/:id", UpdateProject)
 	projects.DELETE("/:id", DeleteProject)
 
+	router.GET("/scripts/:id/project.js", GetProjectScript)
 	router.GET("/", GetIndex)
 
-	router.GET("/login", GetLogin)
-	router.GET("/auth", GetAuth)
+	router.POST("/api/v1/users", CreateUser)
+	router.POST("/api/v1/login", LogIn)
 
 	router.NoRoute(NoRoute)
 

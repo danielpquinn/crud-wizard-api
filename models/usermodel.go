@@ -1,12 +1,11 @@
 package models
 
-import "github.com/jinzhu/gorm"
-
 type (
 	// User information
 	User struct {
-		gorm.Model
+		ID       uint   `gorm:"primary_key" json:"id"`
 		Email    string `json:"email"`
 		Password string
+		Projects []Project
 	}
 )

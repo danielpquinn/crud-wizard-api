@@ -1,14 +1,11 @@
 package models
 
-import "github.com/jinzhu/gorm"
-
 type (
 	// Project used to drive admin interface
 	Project struct {
-		gorm.Model
+		ID      uint   `gorm:"primary_key" json:"id"`
 		Name    string `json:"name"`
 		Content string `json:"content"`
-		User    User
-		UserID  int `json:"userID"`
+		UserID  uint   `json:"userId"`
 	}
 )

@@ -21,5 +21,7 @@ func Authenticate(c *gin.Context) {
 		return
 	}
 
+	c.Set("UserID", authToken.UserID)
+
 	c.Next()
 }
