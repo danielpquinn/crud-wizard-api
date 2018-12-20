@@ -72,10 +72,11 @@ func LogIn(c *gin.Context) {
 	var user models.User
 	c.BindJSON(&user)
 
-	existingUser := user
-	lib.Database.Where("email = ?", existingUser.Email).First(&existingUser)
+	println(user.Email)
 
-	if existingUser.ID == 0 {
+	existingUser := user
+	if lib.Database.Where("email = ?", existingUser.Email).First(&existingUser).RecordNotFound() {
+		println("not found")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
@@ -83,6 +84,10 @@ func LogIn(c *gin.Context) {
 	existingPassword := []byte(existingUser.Password)
 	providedPassword := []byte(user.Password)
 	err := bcrypt.CompareHashAndPassword(existingPassword, providedPassword)
+
+	println(err)
+	println(user.Email)
+	println(existingUser.ID)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})

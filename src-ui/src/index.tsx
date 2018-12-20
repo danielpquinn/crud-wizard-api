@@ -2,6 +2,7 @@ import * as axios from "axios";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Desktop } from "src/components/Desktop";
 import { CreateProject } from "src/components/projects/CreateProject";
 import { Project } from "src/components/projects/Project";
 import { Projects } from "src/components/projects/Projects";
@@ -29,6 +30,7 @@ ReactDOM.render(
       <Route path="/projects" component={Projects} />
       <Route path="/create-project" component={CreateProject} />
       <Route path="/projects/:id" component={Project} />
+      <Route path="/desktop/:id" component={Desktop} />
       <Toaster />
     </div>
   </Router>,

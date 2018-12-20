@@ -1,9 +1,9 @@
 import * as axios from "axios";
 import * as React from "react";
-import { Link } from 'react-router-dom';
-import { getErrorMessage } from 'src/lib/error';
+import { Link } from "react-router-dom";
+import { getErrorMessage } from "src/lib/error";
 import { getToastManager } from "src/lib/ToastManager";
-import { IProject } from "src/models/Project";
+import { IProject } from "src/types/Project";
 
 interface IState {
   projects: IProject[] | null;
@@ -31,7 +31,7 @@ export class Projects extends React.Component<{}, IState> {
     if (!projects || projects.length === 0) {
       content = (
         <div className="container">
-          <p>You don't have any projects</p>
+          <p>You don"t have any projects</p>
         </div>
       );
     } else {
@@ -42,6 +42,7 @@ export class Projects extends React.Component<{}, IState> {
               return (
                 <tr key={project.id}>
                   <td><Link to={`/projects/${project.id}`}>{project.name}</Link></td>
+                  <td><Link to={`/desktop/${project.id}`}>Desktop</Link></td>
                   <td><button className="btn" onClick={() => this.deleteProject(project.id)}><i className="zmdi zmdi-delete" /></button></td>
                 </tr>
               );

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Toast } from "src/components/Toast";
-import "src/components/Toaster.css";
 import { getToastManager } from "src/lib/ToastManager";
 import { IToast } from "src/types/toast";
 

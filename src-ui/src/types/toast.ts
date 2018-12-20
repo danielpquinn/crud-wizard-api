@@ -1,4 +1,4 @@
-import { level } from "./bootstrap";
+import { level } from "src/types/bootstrap";
 
 export interface IToast {
   id: number;

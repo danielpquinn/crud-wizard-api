@@ -56,3 +56,143 @@ a:hover, .btn-link:hover {
 .btn-lg {
   border-radius: 1.5rem;
 }
+body {
+  background-color: #eeeeee;
+  font-family: 'Nunito', sans-serif;
+}
+
+.navigation {
+  position: absolute;
+  top: 38px;
+  bottom: 0;
+  left: 0;
+  width: 220px;
+  transition: margin-left 0.2s;
+  background-color: white;
+  border-right: 1px solid #cccccc;
+}
+
+.header {
+  height: 38px;
+  background-color: white;
+  border-bottom: 1px solid #cccccc;
+  padding-right: 1rem;
+}
+
+a, .btn-link {
+  color: #0000ff;
+  opacity: 1;
+}
+
+a:hover, .btn-link:hover {
+  color: #000099;
+}
+
+.btn-primary {
+  background-color: #0000ff;
+  border-color: #0000ff;
+}
+
+.btn-primary:hover {
+  background-color: #000099;
+  border-color: #000099;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+  background-color: #000099;
+}
+
+.window-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal {
+  position: absolute;
+  display: block;
+  right: auto;
+  bottom: auto;
+  z-index: auto;
+}
+
+.modal-content {
+  background-color: #f6f6f6;
+}
+
+.modal.active .modal-content {
+  background-color: #ffffff;
+}
+
+@media (min-width: 576px) {
+  .modal-dialog {
+    max-width: none;
+    margin: 0;
+  }
+}
+
+.modal-body {
+  overflow: scroll;
+}
+
+.grabbable {
+  cursor: move;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.grabbable:active { 
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.resize-handle {
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  background-image: url("/images/resize-handle-bottom-left.png");
+  background-size: 100% 100%;
+}
+
+.table-toggle-columns {
+  width: 100%;
+}
+
+.list-table th,
+.list-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loading {
+  padding: 1rem 0;
+}
+
+.json-viewer {
+  font-family: monospace;
+}
+
+.json-viewer ul {
+  padding-inline-start: 15px;
+}
+
+.json-viewer li {
+  list-style: none;
+}
+
+.form-control:focus {
+  border-color: #0000ff;
+}
+
+nav.navigation.col-md-2.sidebar {
+  padding-top: 20px;
+}
+
+.toaster {
+  position: fixed;
+  top: 58px;
+  right: 20px;
+}
