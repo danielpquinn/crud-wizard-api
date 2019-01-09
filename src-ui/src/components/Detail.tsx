@@ -5,8 +5,8 @@ import { Alert } from "src/components/Alert";
 import { Button } from "src/components/Button";
 import { JsonViewer } from "src/components/JsonViewer";
 import { Loading } from "src/components/Loading";
-import { getConfigManager } from "src/lib/ConfigManager";
-import { findOperationObject, IOperationArguments, IOperationObjectWithPathAndMethod, operate } from "src/lib/swagger";
+import { getProjectManager } from "src/lib/ProjectManager";
+import { findOperationObject, IOperationObjectWithPathAndMethod, IOperationParameters, operate } from "src/lib/swagger";
 import { getToastManager } from "src/lib/ToastManager";
 import { getWindowManager, WindowType } from "src/lib/WindowManager";
 import { IBreadcrumb } from "src/types/breadcrumb";
@@ -15,7 +15,7 @@ import { Response, Schema } from "src/types/swagger";
 
 interface IProps {
   breadcrumbs: IBreadcrumb[];
-  defaultArgs?: IOperationArguments;
+  defaultArgs?: IOperationParameters;
   resourceId: string;
   id: string;
 }
@@ -83,7 +83,7 @@ export class Detail extends React.Component<IProps, IState> {
           <div className="col">
             <ul className="nav">
               {this.resource.relationships && this.resource.relationships.map((relationship, i) => {
-                const relatedResource = getConfigManager().getResource(relationship.resourceId);
+                const relatedResource = getProjectManager().getResource(relationship.resourceId);
 
                 if (!relatedResource) {
                   return null;
@@ -139,14 +139,14 @@ export class Detail extends React.Component<IProps, IState> {
   private initialize(): string | null {
     const { resourceId } = this.props;
 
-    this.resource = getConfigManager().getResource(resourceId);
+    this.resource = getProjectManager().getResource(resourceId);
 
     if (!this.resource) {
       return `Could not find resource with id ${resourceId}. Please make sure your resources.ts file is correct`;
     }
 
     const { getOperation, spec } = this.resource;
-    const resolvedSpec = getConfigManager().getResolvedSpec(spec);
+    const resolvedSpec = getProjectManager().getResolvedSpec(spec);
 
     this.operation = findOperationObject(resolvedSpec, getOperation);
     
@@ -154,7 +154,8 @@ export class Detail extends React.Component<IProps, IState> {
       return `Resource ${resourceId} does not have a \`getOperation\` field, cannot render detail view. Please make sure your resources.ts file is correct`;
     }
 
-    this.schema = (this.operation.operation.responses["200"] as Response).schema;
+    const responses = this.operation.operation.responses;
+    this.schema = ((responses["200"] || responses.default) as Response).schema;
     
     if (!this.schema || !this.schema.properties) {
       return `GET operation for resource ${resourceId} does not have an properties \`schema\` field for it's 200 response, cannot render detail view. Please make sure your resources.ts file is correct`;
@@ -170,7 +171,7 @@ export class Detail extends React.Component<IProps, IState> {
       return;
     }
 
-    const resolvedSpec = getConfigManager().getResolvedSpec(this.resource.spec);
+    const resolvedSpec = getProjectManager().getResolvedSpec(this.resource.spec);
 
     if (this.resource.deleteOperation) {
       const operation = findOperationObject(resolvedSpec, this.resource.deleteOperation);
@@ -209,7 +210,7 @@ export class Detail extends React.Component<IProps, IState> {
     if (!this.resource || !this.operation) {
       return;
     }
-    const resolvedSpec = getConfigManager().getResolvedSpec(this.resource.spec);
+    const resolvedSpec = getProjectManager().getResolvedSpec(this.resource.spec);
     
     const args = {};
 

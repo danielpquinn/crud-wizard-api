@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/codemirror": "^0.0.70",
     "axios": "^0.18.0",
+    "codemirror": "^5.42.2",
+    "informed": "^1.10.12",
     "lodash": "^4.17.11",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",

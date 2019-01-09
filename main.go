@@ -8,6 +8,5 @@ import (
 
 func main() {
 	lib.InitializeDatabase()
-	lib.InitializeGoogleOauth2Client()
 	routes.Initialize()
 }

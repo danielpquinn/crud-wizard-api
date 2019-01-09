@@ -1,0 +1,20 @@
+version: "3"
+services:
+  web:
+    image: crudwizard/ui
+    ports:
+      - "3000:80"
+  api:
+    image: crudwizard/api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "db"
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: crudwizard
+      POSTGRES_DB: crudwizard
+      POSTGRES_PASSWORD: crudwizard
+    ports:
+      - "5432:5432"

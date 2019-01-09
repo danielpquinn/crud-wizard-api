@@ -1,8 +1,8 @@
 import * as React from "react";
 import { ParamForm } from "src/components/ParamForm";
 import { Window } from "src/components/Window";
-import { getConfigManager } from "src/lib/ConfigManager";
-import { IOperationArguments, operate } from "src/lib/swagger";
+import { getProjectManager } from "src/lib/ProjectManager";
+import { IOperationParameters, operate } from "src/lib/swagger";
 import { IResource } from "src/types/resource";
 
 interface IOption {
@@ -25,7 +25,7 @@ interface IState {
 
 export class ResourceSelector extends React.Component<IProps, IState> {
   private resource: IResource;
-  private args: IOperationArguments;
+  private args: IOperationParameters;
 
   constructor(props: IProps) {
     super(props);
@@ -35,7 +35,7 @@ export class ResourceSelector extends React.Component<IProps, IState> {
       options: []
     };
     const { resourceId } = this.props;
-    const resource = getConfigManager().getResources().find(r => r.id === resourceId);
+    const resource = getProjectManager().getResources().find(r => r.id === resourceId);
     if (!resource) { throw new Error(`Could not find resource ${resourceId}`); }
     this.resource = resource;
   }
@@ -86,7 +86,7 @@ export class ResourceSelector extends React.Component<IProps, IState> {
     this.setState({ modalOpen: false });
   };
 
-  private onParamFormChange = (args: IOperationArguments) => {
+  private onParamFormChange = (args: IOperationParameters) => {
     this.args = args;
   }
 
@@ -94,7 +94,7 @@ export class ResourceSelector extends React.Component<IProps, IState> {
     const { onChange } = this.props;
     const { spec } = this.resource;
 
-    const response = await operate(getConfigManager().getResolvedSpec(spec), this.resource.listOperation, this.args);
+    const response = await operate(getProjectManager().getResolvedSpec(spec), this.resource.listOperation, this.args);
     
     if (response.status === 200 && response.data) {
       const options = response.data.map((item: any) => {

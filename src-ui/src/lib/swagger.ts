@@ -1,17 +1,9 @@
 /**
  * OpenAPI utilities
  */
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import {
-  BodyParameter,
-  FormDataParameter,
-  HeaderParameter,
-  Operation,
-  PathParameter,
-  QueryParameter,
-  Ref,
-  Spec
-} from "../types/swagger";
+import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { getAxios } from "src/lib/axiosManager";
+import { BodyParameter, FormDataParameter, HeaderParameter, Operation, PathParameter, QueryParameter, Ref, Spec } from "src/types/swagger";
 
 export type ResolvedParameter =
   BodyParameter |
@@ -20,7 +12,7 @@ export type ResolvedParameter =
   PathParameter |
   HeaderParameter;
 
-export interface IOperationArguments {
+export interface IOperationParameters {
   [key: string]: any;
 }
 
@@ -116,14 +108,14 @@ export const resolveAllReferences = (spec: Spec): Spec => {
       for (let i = 0; i < node.length; i += 1) {
         const item = node[i];
         if (isArrayOrObject(item)) {
-          node[i] = resolveReference(resolved as Spec, item);
-          resolvedQueue.push(item);
+          node[i] = resolveReference(spec, item);
+          resolvedQueue.push(node[i]);
         }
       }
     } else if (isObject(node)) {
       for (const key in node) {
         if (node[key]) {
-          node[key] = resolveReference(resolved as Spec, node[key]);
+          node[key] = resolveReference(spec, node[key]);
           if (isArrayOrObject(node[key])) {
             resolvedQueue.push(node[key]);
           }
@@ -137,7 +129,7 @@ export const resolveAllReferences = (spec: Spec): Spec => {
 
 export const resolveReference = <RefType>(spec: Spec, value: RefType | Ref): RefType => {
   const referenceObject: Ref = value as Ref;
-  if (referenceObject.$ref) {
+  if (referenceObject.$ref && referenceObject.$ref.startsWith("#")) {
     let result: any = spec;
     const path = referenceObject.$ref.substring(2, referenceObject.$ref.length).split("/");
     for (const segment of path) {
@@ -151,20 +143,12 @@ export const resolveReference = <RefType>(spec: Spec, value: RefType | Ref): Ref
   return value as RefType;
 }
 
-export const operationArgsInterceptors: Array<((spec: Spec, operationId: string, args: IOperationArguments) => Promise<IOperationArguments>)> = [];
-export const operationResponseInterceptors: Array<((spec: Spec, operationId: string, response: AxiosResponse) => Promise<AxiosResponse>)> = [];
-
-export const operate = async (spec: Spec, operationId: string, args: IOperationArguments): Promise<AxiosResponse> => {
+export const getRequestConfig = async (spec: Spec, operationId: string, args: IOperationParameters) => {
   const operation = findOperationObject(spec, operationId);
   if (!operation) { throw new Error(`Could not find operation with ID ${operationId}`); }
-  let url = new URL(`https://${spec.host}${spec.basePath}${operation.path}`);
+  let url = new URL(`http://${spec.host}${spec.basePath || ""}${operation.path}`);
 
-  const interceptedArguments = await operationArgsInterceptors.reduce(async (previousValue, interceptor) => {
-    const prev = await previousValue;
-    return interceptor(spec, operationId, prev);
-  }, Promise.resolve(args));
-
-  const options: AxiosRequestConfig = {
+  const config: AxiosRequestConfig = {
     headers: { "Content-Type": "application/json" },
     method: operation.method,
   };
@@ -178,17 +162,17 @@ export const operate = async (spec: Spec, operationId: string, args: IOperationA
 
     pathParams.forEach(param => {
       if (!param) { return; }
-      const argument = interceptedArguments[param.name];
+      const argument = args[param.name];
       if (argument) {
         path = path.replace(`{${param.name}}`, encodeURIComponent(argument));
       }
     });
 
-    url = new URL(`https://${spec.host}${spec.basePath}${path}`);
+    url = new URL(`http://${spec.host}${spec.basePath || ""}${path}`);
 
     queryParams.forEach(param => {
       if (!param) { return; }
-      const argument = interceptedArguments[param.name];
+      const argument = args[param.name];
       if (argument) {
         url.searchParams.append(param.name, argument);
       }
@@ -196,19 +180,21 @@ export const operate = async (spec: Spec, operationId: string, args: IOperationA
 
     bodyParams.forEach(param => {
       if (!param) { return; }
-      options.data = interceptedArguments[param.name];
+      config.data = args[param.name];
     });
   }
 
-  options.url = url.href;
+  config.url = url.href;
+
+  return config;
+};
+
+export const operate = async (spec: Spec, operationId: string, args: IOperationParameters): Promise<AxiosResponse> => {
+  const config = await getRequestConfig(spec, operationId, args);
 
   try {
-    const response = await axios(options);
-    const interceptedResponse = await operationResponseInterceptors.reduce(async (prevValue, interceptor) => {
-      await prevValue;
-      return interceptor(spec, operationId, response);
-    }, Promise.resolve(response));
-    return interceptedResponse;
+    const response = await getAxios()(config);
+    return response;
   } catch (e) {
     // tslint:disable:no-console
     console.error(e);

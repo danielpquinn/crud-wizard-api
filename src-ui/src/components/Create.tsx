@@ -4,8 +4,8 @@ import { Alert } from "src/components/Alert";
 import { Button } from "src/components/Button";
 import { JsonViewer } from "src/components/JsonViewer";
 import { ParamForm } from "src/components/ParamForm";
-import { getConfigManager } from "src/lib/ConfigManager";
-import { IOperationArguments, operate } from "src/lib/swagger";
+import { getProjectManager } from "src/lib/ProjectManager";
+import { IOperationParameters, operate } from "src/lib/swagger";
 import { getToastManager } from "src/lib/ToastManager";
 import { getWindowManager } from "src/lib/WindowManager";
 import { IBreadcrumb } from "src/types/breadcrumb";
@@ -39,14 +39,14 @@ interface IState {
  */
 export class Create extends React.Component<IProps, IState> {
   private resource: IResource | undefined;
-  private args: IOperationArguments;
+  private args: IOperationParameters;
 
   constructor(props: IProps) {
     super(props);
 
     // Attempt to find a resource and create operation for this resource
 
-    this.resource = getConfigManager().getResource(props.resourceId);
+    this.resource = getProjectManager().getResource(props.resourceId);
 
     const defaultFormValues = {};
 
@@ -87,7 +87,7 @@ export class Create extends React.Component<IProps, IState> {
   /**
    * Handle param form changes
    */
-  private onParamFormChange = (args: IOperationArguments) => {
+  private onParamFormChange = (args: IOperationParameters) => {
     this.args = args;
   }
 
@@ -96,7 +96,7 @@ export class Create extends React.Component<IProps, IState> {
    */
   private create = async () => {
     if (this.resource && this.resource.createOperation) {
-      const axiosResponse = await operate(getConfigManager().getResolvedSpec(this.resource.spec), this.resource.createOperation, this.args);
+      const axiosResponse = await operate(getProjectManager().getResolvedSpec(this.resource.spec), this.resource.createOperation, this.args);
       if (axiosResponse.status >= 400) {
         this.setState({ axiosResponse });
       } else {

@@ -20,8 +20,6 @@ func Initialize() {
 	config.AllowMethods = []string{"GET", "PUT", "POST", "DELETE"}
 	router.Use(cors.New(config))
 
-	router.LoadHTMLGlob("templates/*")
-
 	projects := router.Group("api/v1/projects")
 	projects.Use(middleware.Authenticate)
 	projects.GET("/", ListProjects)
@@ -29,9 +27,6 @@ func Initialize() {
 	projects.POST("/", CreateProject)
 	projects.PUT("/:id", UpdateProject)
 	projects.DELETE("/:id", DeleteProject)
-
-	router.GET("/scripts/:id/project.js", GetProjectScript)
-	router.GET("/", GetIndex)
 
 	router.POST("/api/v1/users", CreateUser)
 	router.POST("/api/v1/login", LogIn)

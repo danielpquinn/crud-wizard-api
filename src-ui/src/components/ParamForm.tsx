@@ -2,9 +2,9 @@ import { get, set, startCase } from "lodash";
 import * as React from "react";
 import { Alert } from "src/components/Alert";
 import { maxFormColumnWidth } from "src/constants";
-import { getConfigManager } from "src/lib/ConfigManager";
 import { getNumColumns } from "src/lib/layout";
-import { findOperationObject, IOperationArguments, IOperationObjectWithPathAndMethod, ResolvedParameter } from "src/lib/swagger";
+import { getProjectManager } from "src/lib/ProjectManager";
+import { findOperationObject, IOperationObjectWithPathAndMethod, IOperationParameters, ResolvedParameter } from "src/lib/swagger";
 import { IResource } from "src/types/resource";
 import { BodyParameter, Schema } from "src/types/swagger";
 
@@ -12,7 +12,7 @@ interface IProps {
   defaults?: { [key: string]: string };
   resource: IResource;
   operation: string;
-  onChange: (args: IOperationArguments) => any;
+  onChange: (args: IOperationParameters) => any;
 }
 
 interface IState {
@@ -211,7 +211,7 @@ export class ParamForm extends React.Component<IProps, IState> {
     super(props);
     const { resource, operation } = props;
     const { spec } = resource;
-    const resolvedSpec = getConfigManager().getResolvedSpec(spec);
+    const resolvedSpec = getProjectManager().getResolvedSpec(spec);
     let errorMessage = null;
 
     // Find the operation we want to render a form for in the spec

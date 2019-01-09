@@ -1,26 +1,33 @@
 import * as axios from "axios";
 import * as H from "history";
+import { Form, Text, TextArea } from "informed";
 import * as React from "react";
+import { Link } from "react-router-dom";
+import { getErrorMessage } from "src/lib/error";
+import { getToastManager } from "src/lib/ToastManager";
 
 interface IProps {
   history: H.History;
 }
 
 interface IState {
-  projectName: string;
-  projectContent: string;
   errorMessage: string | null;
+}
+
+interface IFormValues {
+  name: string;
+  specs: string;
+  resources: string;
+  initialize: string;
+  addPageParams: string;
+  getTotalResults: string;
 }
 
 export class CreateProject extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this.state = {
-      errorMessage: null,
-      projectName: "",
-      projectContent: ""
-    };
+    this.state = { errorMessage: null };
   }
 
   public render() {
@@ -29,56 +36,74 @@ export class CreateProject extends React.Component<IProps, IState> {
     if (errorMessage !== null) {
       return (
         <div className="alert alert-warning">{errorMessage}</div>
-      )
+      );
     }
 
     return (
       <div className="container">
         <div className="row">
-          <div className="col-3" />
-          <div className="col-6">
+          <div className="col-12">
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item active"><Link to="/projects">Projects</Link></li>
+                <li className="breadcrumb-item active">Create Project</li>
+              </ol>
+            </nav>
             <h3>Create Project</h3>
-            <form onSubmit={this.onSubmit}>
-              <div className="form-group">
-                <label htmlFor="projectName">Name</label>
-                <input
-                  name="projectName"
-                  type="text"
-                  className="form-control form-control-sm"
-                  onChange={(e) => this.setState({ projectName: e.target.value })}
-                  value={this.state.projectName}
-                />
+            <Form<IFormValues> onSubmit={this.onSubmit} >
+              {({ formApi }) => (
+              <div className="card">
+                <div className="card-body">
+                  <div className="form-group">
+                    <label>Name</label>
+                    <Text className="form-control form-control-sm" field="name"/>
+                    <small>{formApi.getError("name")}</small>
+                  </div>
+                  <div className="form-group">
+                    <label>Initialize function</label>
+                    <TextArea className="form-control form-control-sm" field="initialize"/>
+                    <small>{formApi.getError("initialize")}</small>
+                  </div>
+                  <div className="form-group">
+                    <label>Add page params function</label>
+                    <TextArea className="form-control form-control-sm" field="addPageParams"/>
+                    <small>{formApi.getError("addPageParams")}</small>
+                  </div>
+                  <div className="form-group">
+                    <label>Get total results function</label>
+                    <TextArea className="form-control form-control-sm" field="getTotalResults"/>
+                    <small>{formApi.getError("getTotalResults")}</small>
+                  </div>
+                  <div className="form-group">
+                    <label>Resources</label>
+                    <TextArea className="form-control form-control-sm" field="resources"/>
+                    <small>{formApi.getError("resources")}</small>
+                  </div>
+                  <div className="form-group">
+                    <label>Specs</label>
+                    <TextArea className="form-control form-control-sm" field="specs"/>
+                    <small>{formApi.getError("content")}</small>
+                  </div>
+                </div>
+                <div className="card-footer">
+                  <button className="btn btn-primary" type="submit">Create project</button>
+                </div>
               </div>
-              <div className="form-group">
-                <label htmlFor="projectContent">Content</label>
-                <textarea
-                  name="projectContent"
-                  className="form-control form-control-sm"
-                  onChange={(e) => this.setState({ projectContent: e.target.value })}
-                  value={this.state.projectContent}
-                />
-              </div>
-              <button type="submit" className="btn btn-primary">Create Project</button>
-            </form>
+              )}
+            </Form>
           </div>
-          <div className="col-3" />
         </div>
       </div>
-    )
+    );
   }
 
-  private onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const result = await axios.default.post("http://localhost:8080/api/v1/projects/", {
-      name: this.state.projectName,
-      content: this.state.projectContent
-    });
-    if (result.status >= 400) {
-      this.setState({
-        errorMessage: result.data ? result.data.message : "Could not create project"
-      });
-    } else {
-      this.props.history.push("projects");
+  private onSubmit = async (values: IFormValues) => {
+    try {
+      await axios.default.post("http://localhost:8080/api/v1/projects/", values);
+      getToastManager().addToast(`Created project "${values.name}"`, "success");
+      this.props.history.push("/projects");
+    } catch (e) {
+      getToastManager().addToast(`Error creating project ${values.name}: ${getErrorMessage(e)}`, "danger");
     }
   };
 }

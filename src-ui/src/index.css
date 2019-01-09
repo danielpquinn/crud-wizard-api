@@ -3,7 +3,6 @@ body,
 #root,
 .router {
   height: 100%;
-  overflow: hidden;
 }
 
 body {
@@ -56,9 +55,15 @@ a:hover, .btn-link:hover {
 .btn-lg {
   border-radius: 1.5rem;
 }
+
 body {
-  background-color: #eeeeee;
   font-family: 'Nunito', sans-serif;
+}
+
+.desktop {
+  background-color: #eeeeee;
+  width: 100%;
+  height: 100%;
 }
 
 .navigation {
@@ -195,4 +200,8 @@ nav.navigation.col-md-2.sidebar {
   position: fixed;
   top: 58px;
   right: 20px;
+}
+
+.list-component .pagination {
+  justify-content: center;
 }

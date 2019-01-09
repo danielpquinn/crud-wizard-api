@@ -9,10 +9,10 @@ export class Home extends React.Component<{}, {}> {
         <div className="row row-home h-100">
 
           <div className="col-7 home-col-left h-100 p-5">
-            <img src="home-background.svg" className="home-background"/>
+            <img src={`${process.env.PUBLIC_URL}/home-background.svg`} className="home-background"/>
             <div className="row">
               <div className="col-10">
-                <img src="home-logo.png" alt="crud wizard" className="home-logo mb-5"/>
+                <img src={`${process.env.PUBLIC_URL}/home-logo.png`} alt="crud wizard" className="home-logo mb-5"/>
                 <h2 className="mb-4">Generate a user interface for your API in minutes.</h2>
                 <h5 className="mb-4">Provide crud wizard with an OpenAPI specification for your API and it will generate a flexible, polished and robust user interface for managing your resources.</h5>
                 <a href="#" className="btn btn-light mr-3">documentation</a>

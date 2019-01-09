@@ -5,6 +5,11 @@ import (
 	"encoding/base64"
 	"net/http"
 
+	"github.com/satori/go.uuid"
+
+	"github.com/jinzhu/gorm"
+
+	"github.com/asaskevich/govalidator"
 	"github.com/danielpquinn/crud-wizard-projects/lib"
 	"github.com/danielpquinn/crud-wizard-projects/models"
 	"github.com/gin-gonic/gin"
@@ -22,9 +27,7 @@ func GetUser(c *gin.Context) {
 	var user models.User
 	id := c.Param("id")
 
-	lib.Database.Where(&user, id)
-
-	if user.ID == 0 {
+	if err := lib.Database.Where(&user, id).Error; gorm.IsRecordNotFoundError(err) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
@@ -37,33 +40,47 @@ func CreateUser(c *gin.Context) {
 	var user models.User
 	c.BindJSON(&user)
 
-	existingUser := user
-	lib.Database.Where("email = ?", existingUser.Email).First(&existingUser)
+	result, err := govalidator.ValidateStruct(&user)
 
-	if existingUser.ID != 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "An account with this email already exists"})
+	if !result {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-
-	tokenString := string(getToken())
-
-	authToken := models.AuthToken{
-		Value:  tokenString,
-		UserID: user.ID,
-	}
-
-	encrypted, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Could not create user"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Invalid request"})
 		return
 	}
 
-	user.Password = string(encrypted)
+	if err := lib.Database.Where("email = ?", user.Email).First(&user).Error; gorm.IsRecordNotFoundError(err) {
 
-	lib.Database.Create(&authToken)
+		encrypted, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 
-	c.JSON(http.StatusCreated, gin.H{"token": tokenString})
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Could not create user"})
+			return
+		}
+
+		user.Password = string(encrypted)
+		user.ID = uuid.NewV4()
+
+		lib.Database.Create(&user)
+
+		tokenString := string(getToken())
+
+		authToken := models.AuthToken{
+			ID:     uuid.NewV4(),
+			Value:  tokenString,
+			UserID: user.ID,
+		}
+
+		lib.Database.Create(&authToken)
+
+		c.JSON(http.StatusCreated, gin.H{"token": tokenString})
+		return
+	}
+
+	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "An account with this email already exists"})
 }
 
 // LogIn checks username and password and returns a token
@@ -72,22 +89,15 @@ func LogIn(c *gin.Context) {
 	var user models.User
 	c.BindJSON(&user)
 
-	println(user.Email)
+	providedPassword := []byte(user.Password)
 
-	existingUser := user
-	if lib.Database.Where("email = ?", existingUser.Email).First(&existingUser).RecordNotFound() {
-		println("not found")
+	if err := lib.Database.Where("email = ?", user.Email).First(&user).Error; gorm.IsRecordNotFoundError(err) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 
-	existingPassword := []byte(existingUser.Password)
-	providedPassword := []byte(user.Password)
+	existingPassword := []byte(user.Password)
 	err := bcrypt.CompareHashAndPassword(existingPassword, providedPassword)
-
-	println(err)
-	println(user.Email)
-	println(existingUser.ID)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
@@ -97,6 +107,7 @@ func LogIn(c *gin.Context) {
 	tokenString := string(getToken())
 
 	authToken := models.AuthToken{
+		ID:     uuid.NewV4(),
 		Value:  tokenString,
 		UserID: user.ID,
 	}

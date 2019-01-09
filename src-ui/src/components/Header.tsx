@@ -1,6 +1,6 @@
 import * as React from "react";
-import { getConfigManager } from "src/lib/ConfigManager";
 import { getNavigationManager } from "src/lib/NavigationManager";
+import { getProjectManager } from "src/lib/ProjectManager";
 
 interface IState {
   accountOpen: boolean;
@@ -23,7 +23,7 @@ export class Header extends React.Component<{}, IState> {
 
   public render() {
     const { accountOpen } = this.state;
-    const signOut = getConfigManager().getConfig().signOut;
+    const signOut = getProjectManager().getConfig().signOut;
 
     // tslint:disable:jsx-no-lambda
     return (

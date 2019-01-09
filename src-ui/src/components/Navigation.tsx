@@ -1,6 +1,6 @@
 import * as React from "react";
-import { getConfigManager } from "src/lib/ConfigManager";
 import { getNavigationManager } from "src/lib/NavigationManager";
+import { getProjectManager } from "src/lib/ProjectManager";
 import { getWindowManager, WindowType } from "src/lib/WindowManager";
 
 interface IState {
@@ -41,7 +41,7 @@ export class Navigation extends React.Component<{}, IState> {
         style={{ marginLeft: navigationOpen ? "0px" : "-300px" }}
       >
         <ul className="nav flex-column">
-          {getConfigManager().getResources().map((resource, i) => {
+          {getProjectManager().getResources().map((resource, i) => {
             return (
               <li  key={i} className="nav-item">
                 <a

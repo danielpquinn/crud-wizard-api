@@ -3,6 +3,8 @@ package middleware
 import (
 	"net/http"
 
+	"github.com/jinzhu/gorm"
+
 	"github.com/danielpquinn/crud-wizard-projects/lib"
 	"github.com/danielpquinn/crud-wizard-projects/models"
 	"github.com/gin-gonic/gin"
@@ -13,9 +15,7 @@ func Authenticate(c *gin.Context) {
 	var authToken models.AuthToken
 	authorizationHeader := c.Request.Header.Get("Authorization")
 
-	lib.Database.Where("value = ?", authorizationHeader).First(&authToken)
-
-	if authToken.ID == 0 {
+	if err := lib.Database.Where("value = ?", authorizationHeader).First(&authToken).Error; gorm.IsRecordNotFoundError(err) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		c.Abort()
 		return

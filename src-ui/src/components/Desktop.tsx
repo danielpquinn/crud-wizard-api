@@ -8,7 +8,8 @@ import { Navigation } from "src/components/Navigation";
 import { Toaster } from "src/components/Toaster";
 import { Window } from "src/components/Window";
 import { headerHeight } from "src/constants";
-import { getConfigManager } from "src/lib/ConfigManager";
+import { resetAxios } from "src/lib/axiosManager";
+import { getProjectManager } from "src/lib/ProjectManager";
 import { getWindowManager, IWindows, WindowType } from "src/lib/WindowManager";
 
 interface IProps {
@@ -31,7 +32,10 @@ export class Desktop extends React.Component<IProps, IState> {
   }
 
   public async componentDidMount(): Promise<void> {
-    await getConfigManager().loadConfig(this.props.match.params.id);
+    resetAxios();
+
+    await getProjectManager().loadConfig(this.props.match.params.id);
+
     this.setState({
       windows: getWindowManager().getWindows()
     });

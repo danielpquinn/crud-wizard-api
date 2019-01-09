@@ -1,12 +1,13 @@
 import * as axios from "axios";
 import * as React from "react";
 import { Link } from "react-router-dom";
+import { Alert } from "src/components/Alert";
 import { getErrorMessage } from "src/lib/error";
 import { getToastManager } from "src/lib/ToastManager";
-import { IProject } from "src/types/Project";
+import { IProjectResponseBody } from "src/types/ProjectResponseBody";
 
 interface IState {
-  projects: IProject[] | null;
+  projects: IProjectResponseBody[] | null;
   errorMessage: string | null;
 }
 
@@ -15,7 +16,7 @@ export class Projects extends React.Component<{}, IState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      projects: [],
+      projects: null,
       errorMessage: null
     };
   }
@@ -28,22 +29,43 @@ export class Projects extends React.Component<{}, IState> {
     const { projects } = this.state;
     let content: React.ReactNode = null;
 
-    if (!projects || projects.length === 0) {
-      content = (
-        <div className="container">
-          <p>You don"t have any projects</p>
-        </div>
-      );
+    if (!projects) {
+      content = <div className="text-center"><i className="zmdi zmdi-refresh zmdi-hc-spin" /></div> ;
+    } else if (projects.length === 0) {
+      content = <Alert>You don't have any projects</Alert>;
     } else {
       content = (
-        <table className="table w-100">
+        <table className="table table-sm w-100">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Url</th>
+              <th/>
+            </tr>
+          </thead>
           <tbody>
             {projects.map((project) => {
               return (
                 <tr key={project.id}>
-                  <td><Link to={`/projects/${project.id}`}>{project.name}</Link></td>
-                  <td><Link to={`/desktop/${project.id}`}>Desktop</Link></td>
-                  <td><button className="btn" onClick={() => this.deleteProject(project.id)}><i className="zmdi zmdi-delete" /></button></td>
+                  <td className="align-middle">{project.name}</td>
+                  <td className="align-middle"><Link to={`/desktop/${project.id}`}>{window.location.protocol}//{window.location.host}/desktop/{project.id}</Link></td>
+                  <td className="align-middle text-right">
+                    <Link
+                      title="Edit project"
+                      className="btn"
+                      to={`/projects/${project.id}`}
+                    >
+                      <i className="zmdi zmdi-edit" />
+                    </Link>
+                    <a
+                      title="Delete project"
+                      className="btn"
+                      onClick={() => this.deleteProject(project.id)}
+                      href="javascript:void(0);"
+                    >
+                      <i className="zmdi zmdi-delete" />
+                    </a>
+                  </td>
                 </tr>
               );
             })}
@@ -56,8 +78,22 @@ export class Projects extends React.Component<{}, IState> {
       <div className="container">
         <div className="row">
           <div className="col-12">
-            <p><Link to="create-project">Create Project</Link></p>
-            {content}
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item active">Projects</li>
+            </ol>
+          </nav>
+
+            <h3>Projects</h3>
+
+            <div className="card">
+              <div className="card-header">
+                <Link className="btn btn-primary" to="/create-project">Create Project</Link>
+              </div>
+              <div className="card-body">
+                {content}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -82,7 +118,7 @@ export class Projects extends React.Component<{}, IState> {
     
         if (response.status < 400) {
           this.loadProjects();
-          getToastManager().addToast("Deleted project");
+          getToastManager().addToast("Deleted project", "success");
         } else {
           getToastManager().addToast("Error deleting project", "danger");
         }
