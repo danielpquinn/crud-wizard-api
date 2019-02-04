@@ -1,8 +1,9 @@
 import * as axios from "axios";
 import * as H from "history";
-import { Form, Text, TextArea } from "informed";
+import { cloneDeep } from "lodash";
 import * as React from "react";
 import { Link } from "react-router-dom";
+import { ProjectForm } from "src/components/projects/ProjectForm";
 import { getErrorMessage } from "src/lib/error";
 import { getToastManager } from "src/lib/ToastManager";
 
@@ -12,15 +13,6 @@ interface IProps {
 
 interface IState {
   errorMessage: string | null;
-}
-
-interface IFormValues {
-  name: string;
-  specs: string;
-  resources: string;
-  initialize: string;
-  addPageParams: string;
-  getTotalResults: string;
 }
 
 export class CreateProject extends React.Component<IProps, IState> {
@@ -50,60 +42,35 @@ export class CreateProject extends React.Component<IProps, IState> {
               </ol>
             </nav>
             <h3>Create Project</h3>
-            <Form<IFormValues> onSubmit={this.onSubmit} >
-              {({ formApi }) => (
-              <div className="card">
-                <div className="card-body">
-                  <div className="form-group">
-                    <label>Name</label>
-                    <Text className="form-control form-control-sm" field="name"/>
-                    <small>{formApi.getError("name")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Initialize function</label>
-                    <TextArea className="form-control form-control-sm" field="initialize"/>
-                    <small>{formApi.getError("initialize")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Add page params function</label>
-                    <TextArea className="form-control form-control-sm" field="addPageParams"/>
-                    <small>{formApi.getError("addPageParams")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Get total results function</label>
-                    <TextArea className="form-control form-control-sm" field="getTotalResults"/>
-                    <small>{formApi.getError("getTotalResults")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Resources</label>
-                    <TextArea className="form-control form-control-sm" field="resources"/>
-                    <small>{formApi.getError("resources")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Specs</label>
-                    <TextArea className="form-control form-control-sm" field="specs"/>
-                    <small>{formApi.getError("content")}</small>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <button className="btn btn-primary" type="submit">Create project</button>
-                </div>
-              </div>
-              )}
-            </Form>
+            <ProjectForm onSubmit={this.onSubmit} initialValues={undefined} />
           </div>
         </div>
       </div>
     );
   }
 
-  private onSubmit = async (values: IFormValues) => {
+  private onSubmit = async (values: any) => {
+    const parsedValues = cloneDeep(values);
+    
+    // Make sure that specs provided are valid JSON
+
+    if (parsedValues.specs) {
+      for (const spec of parsedValues.specs) {
+        try {
+          spec.spec = JSON.parse(spec.spec);
+        } catch (e) {
+          getToastManager().addToast(`Spec ${spec.id} does not contain valid JSON`, "warning");
+          return;
+        }
+      }
+    }
+
     try {
-      await axios.default.post("http://localhost:8080/api/v1/projects/", values);
-      getToastManager().addToast(`Created project "${values.name}"`, "success");
+      await axios.default.post("http://localhost:8080/api/v1/projects/", parsedValues);
+      getToastManager().addToast(`Created project "${parsedValues.name}"`, "success");
       this.props.history.push("/projects");
     } catch (e) {
-      getToastManager().addToast(`Error creating project ${values.name}: ${getErrorMessage(e)}`, "danger");
+      getToastManager().addToast(`Error creating project ${parsedValues.name}: ${getErrorMessage(e)}`, "danger");
     }
   };
 }

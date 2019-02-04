@@ -1,7 +1,8 @@
 import * as axios from "axios";
-import { Form, FormApi, Text, TextArea } from "informed";
+import { cloneDeep } from "lodash";
 import * as React from "react";
 import { Link, match } from "react-router-dom";
+import { ProjectForm } from "src/components/projects/ProjectForm";
 import { getErrorMessage } from "src/lib/error";
 import { getToastManager } from "src/lib/ToastManager";
 import { IProjectResponseBody } from "src/types/ProjectResponseBody";
@@ -14,17 +15,7 @@ interface IState {
   project: IProjectResponseBody | null;
 }
 
-interface IFormValues {
-  name: string;
-  specs: string;
-  resources: string;
-  initialize: string;
-  addPageParams: string;
-  getTotalResults: string;
-}
-
 export class Project extends React.Component<IProps, IState> {
-  private formApi: FormApi<IFormValues>;
 
   constructor(props: IProps) {
     super(props);
@@ -54,85 +45,48 @@ export class Project extends React.Component<IProps, IState> {
                 <li className="breadcrumb-item active">{project.name}</li>
               </ol>
             </nav>
-
             <h3>Edit Project</h3>
-
-            <Form<IFormValues>
-              onSubmit={this.onSubmit}
-              getApi={this.getFormApi}
-            >
-              {({ formApi }) => (
-              <div className="card">
-                <div className="card-body">
-                  <div className="form-group">
-                    <label>Name</label>
-                    <Text className="form-control form-control-sm" field="name"/>
-                    <small>{formApi.getError("name")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Initialize function</label>
-                    <TextArea className="form-control form-control-sm" field="initialize"/>
-                    <small>{formApi.getError("initialize")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Add page params function</label>
-                    <TextArea className="form-control form-control-sm" field="addPageParams"/>
-                    <small>{formApi.getError("addPageParams")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Get total results function</label>
-                    <TextArea className="form-control form-control-sm" field="getTotalResults"/>
-                    <small>{formApi.getError("getTotalResults")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Resources</label>
-                    <TextArea className="form-control form-control-sm" field="resources"/>
-                    <small>{formApi.getError("resources")}</small>
-                  </div>
-                  <div className="form-group">
-                    <label>Specs</label>
-                    <TextArea className="form-control form-control-sm" field="specs"/>
-                    <small>{formApi.getError("content")}</small>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <button className="btn btn-primary" type="submit">Save changes</button>
-                </div>
-              </div>
-              )}
-            </Form>
+            <ProjectForm onSubmit={this.onSubmit} initialValues={project} />
           </div>
         </div>
       </div>
     );
   }
 
-  private getFormApi = (formApi: FormApi<IFormValues>) => {
-    this.formApi = formApi;
-  }
-
   private loadProject = async () => {
     const id = this.props.match.params.id;
-    try {
-      const response = await axios.default.get(`http://localhost:8080/api/v1/projects/${id}`);
-      if (response.data) {
-        this.setState({ project: response.data });
-        if (this.formApi) {
-          this.formApi.setValues(response.data);
-        }
+    const response = await axios.default.get(`http://localhost:8080/api/v1/projects/${id}`);
+    const project = response.data;
+    if (project.specs) {
+      for (const spec of project.specs) {
+        spec.spec = JSON.stringify(spec.spec);
       }
-    } catch (e) {
-      getToastManager().addToast(getErrorMessage(e), "danger");
     }
+    this.setState({ project });
   }
 
-  private onSubmit = async (values: IFormValues) => {
+  private onSubmit = async (values: any) => {
+    const parsedValues = cloneDeep(values);
+    
+    // Make sure that specs provided are valid JSON
+
+    if (parsedValues.specs) {
+      for (const spec of parsedValues.specs) {
+        try {
+          spec.spec = JSON.parse(spec.spec);
+        } catch (e) {
+          getToastManager().addToast(`Spec ${spec.id} does not contain valid JSON`, "warning");
+          return;
+        }
+      }
+    }
+
     const id = this.props.match.params.id;
     try {
-      await axios.default.put(`http://localhost:8080/api/v1/projects/${id}`, values);
-      getToastManager().addToast(`Edited project "${values.name}"`, "success");
+      await axios.default.put(`http://localhost:8080/api/v1/projects/${id}`, parsedValues);
+      getToastManager().addToast(`Edited project "${parsedValues.name}"`, "success");
     } catch (e) {
-      getToastManager().addToast(`Error updating project ${values.name}: ${getErrorMessage(e)}`, "danger");
+      getToastManager().addToast(`Error updating project ${parsedValues.name}: ${getErrorMessage(e)}`, "danger");
     }
-  };
+  }
 }

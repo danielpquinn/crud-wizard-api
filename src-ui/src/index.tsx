@@ -32,11 +32,13 @@ class App extends React.Component<RouteComponentProps, {}> {
     // Redirect to login on 401
     axios.default.interceptors.response.use(
       response => response,
-      (error) => {
+      async (error) => {
         console.error(error);
         if (error && error.response && error.response.status === 401) {
           localStorage.removeItem(authTokenKey);
           this.props.history.push("/login");
+        } else {
+          throw error;
         }
       }
     );

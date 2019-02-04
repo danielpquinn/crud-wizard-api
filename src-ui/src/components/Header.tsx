@@ -23,7 +23,8 @@ export class Header extends React.Component<{}, IState> {
 
   public render() {
     const { accountOpen } = this.state;
-    const signOut = getProjectManager().getConfig().signOut;
+    const project = getProjectManager().getProject();
+    const signOut = project.signOut;
 
     // tslint:disable:jsx-no-lambda
     return (

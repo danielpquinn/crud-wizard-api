@@ -96,7 +96,9 @@ export class Create extends React.Component<IProps, IState> {
    */
   private create = async () => {
     if (this.resource && this.resource.createOperation) {
-      const axiosResponse = await operate(getProjectManager().getResolvedSpec(this.resource.spec), this.resource.createOperation, this.args);
+      const resolvedSpec = getProjectManager().getResolvedSpec(this.resource.spec);
+      if (!resolvedSpec) { return; }
+      const axiosResponse = await operate(resolvedSpec, this.resource.createOperation, this.args);
       if (axiosResponse.status >= 400) {
         this.setState({ axiosResponse });
       } else {

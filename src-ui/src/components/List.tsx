@@ -273,8 +273,14 @@ export class List extends React.Component<IProps, IState> {
     if (!this.resource) {
       return `Could not find resource with id ${resourceId}.`;
     }
+
     const { listItemSchema, listOperation, spec } = this.resource;
-    this.operation = findOperationObject(getProjectManager().getResolvedSpec(spec), listOperation);
+    const resolvedSpec = getProjectManager().getResolvedSpec(spec);
+    if (!resolvedSpec) {
+      return `Could not find spec with id ${spec}. Please make sure your resources.ts file is correct`;
+    }
+
+    this.operation = findOperationObject(resolvedSpec, listOperation);
     
     if (!this.operation) {
       return `Resource ${resourceId} does not have a \`listOperation\` field, cannot render detail view.`;
@@ -339,8 +345,10 @@ export class List extends React.Component<IProps, IState> {
     const { axiosResponse } = this.state;
 
     const resolvedSpec = getProjectManager().getResolvedSpec(spec);
-    const addPageParams = getProjectManager().getConfig().addPageParams;
-    const getTotalResults = getProjectManager().getConfig().getTotalResults;
+    if (!resolvedSpec) { return; }
+
+    const addPageParams = getProjectManager().getProject().addPageParams;
+    const getTotalResults = getProjectManager().getProject().getTotalResults;
 
     if (addPageParams && axiosResponse) {
       this.params = addPageParams(page, this.params, axiosResponse);

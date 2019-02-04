@@ -94,7 +94,10 @@ export class ResourceSelector extends React.Component<IProps, IState> {
     const { onChange } = this.props;
     const { spec } = this.resource;
 
-    const response = await operate(getProjectManager().getResolvedSpec(spec), this.resource.listOperation, this.args);
+    const resolvedSpec = getProjectManager().getResolvedSpec(spec);
+    if (!resolvedSpec) { return; }
+
+    const response = await operate(resolvedSpec, this.resource.listOperation, this.args);
     
     if (response.status === 200 && response.data) {
       const options = response.data.map((item: any) => {

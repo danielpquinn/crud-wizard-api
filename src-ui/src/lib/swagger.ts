@@ -146,19 +146,18 @@ export const resolveReference = <RefType>(spec: Spec, value: RefType | Ref): Ref
 export const getRequestConfig = async (spec: Spec, operationId: string, args: IOperationParameters) => {
   const operation = findOperationObject(spec, operationId);
   if (!operation) { throw new Error(`Could not find operation with ID ${operationId}`); }
-  let url = new URL(`http://${spec.host}${spec.basePath || ""}${operation.path}`);
+  const url = new URL(`https://${spec.host}${spec.basePath || ""}`);
 
   const config: AxiosRequestConfig = {
     headers: { "Content-Type": "application/json" },
     method: operation.method,
   };
 
+  let path = operation.path;
+
   if (operation.operation.parameters) {
-    let path = operation.path;
     const resolvedParams = operation.operation.parameters.map(param => resolveReference(spec, param));
     const pathParams = resolvedParams.filter(param => param && param.in === "path");
-    const queryParams = resolvedParams.filter(param => param && param.in === "query");
-    const bodyParams = resolvedParams.filter(param => param && param.in === "body");
 
     pathParams.forEach(param => {
       if (!param) { return; }
@@ -167,8 +166,25 @@ export const getRequestConfig = async (spec: Spec, operationId: string, args: IO
         path = path.replace(`{${param.name}}`, encodeURIComponent(argument));
       }
     });
+  }
 
-    url = new URL(`http://${spec.host}${spec.basePath || ""}${path}`);
+  const remainingPathParams = path.match(/{(\w*)}/g);
+
+  if (remainingPathParams) {
+    remainingPathParams.forEach(param => {
+      const paramName = param.substring(1, param.length - 1);
+      if (args[paramName]) {
+        path = path.replace(`{${paramName}}`, encodeURIComponent(args[paramName]));
+      }
+    });
+  }
+
+  url.pathname = `${spec.basePath || ""}${path}`;
+
+  if (operation.operation.parameters) {
+    const resolvedParams = operation.operation.parameters.map(param => resolveReference(spec, param));
+    const queryParams = resolvedParams.filter(param => param && param.in === "query");
+    const bodyParams = resolvedParams.filter(param => param && param.in === "body");
 
     queryParams.forEach(param => {
       if (!param) { return; }

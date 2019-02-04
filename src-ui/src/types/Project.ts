@@ -4,9 +4,10 @@ import { IResource } from "src/types/resource";
 import { Spec } from "src/types/swagger";
 
 /**
- * Project configuration provided by customers
+ * Project configuration provided by users
  */
 export interface IProject {
+  name: string;
   getTotalResults: (response: AxiosResponse) => number;
   addPageParams: (
     page: number,
@@ -15,6 +16,6 @@ export interface IProject {
   ) => IOperationParameters;
   initialize?: (axios: AxiosInstance) => Promise<any>,
   signOut?: () => Promise<any>;
-  resources: IResource[],
-  specs: { [id: string]: Spec }
+  resources: IResource[];
+  specs: Array<{ id: string, spec: Spec }>;
 }

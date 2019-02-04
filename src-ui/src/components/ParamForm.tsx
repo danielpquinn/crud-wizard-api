@@ -194,6 +194,19 @@ class NestedParamForm extends React.Component<INestedParamFormProps, INestedPara
       );
     }
 
+    if (schema.type === "integer") {
+      return (
+        <input
+          className="form-control form-control-sm"
+          type="number"
+          onChange={(e) => {
+            onChange(path, parseInt(e.target.value, 10))
+          }}
+          value={value}
+        />
+      );
+    }
+
     return (
       <input
         className="form-control form-control-sm"
@@ -212,11 +225,15 @@ export class ParamForm extends React.Component<IProps, IState> {
     const { resource, operation } = props;
     const { spec } = resource;
     const resolvedSpec = getProjectManager().getResolvedSpec(spec);
+    let foundOperation = null;
     let errorMessage = null;
 
-    // Find the operation we want to render a form for in the spec
-
-    const foundOperation = findOperationObject(resolvedSpec, operation);
+    if (!resolvedSpec) {
+      errorMessage = `Could not find spec with id ${spec}. Please make sure your resources.ts file is correct`;
+    } else {
+      // Find the operation we want to render a form for in the spec
+      foundOperation = findOperationObject(resolvedSpec, operation);
+    }
 
     if (!foundOperation) {
       errorMessage = `Operation ${operation} does not exist, please fix your configuration`;
@@ -251,13 +268,11 @@ export class ParamForm extends React.Component<IProps, IState> {
 
     // tslint:disable:jsx-no-lambda
     return (
-      <div>
-        <NestedParamForm formState={formState} onChange={this.onChange} path="" schema={schema}/>
-      </div>
+      <NestedParamForm formState={formState} onChange={this.onChange} path="" schema={schema}/>
     );
   }
 
-  private onChange = (path: string, value: string) => {
+  private onChange = (path: string, value: string | number) => {
     const newFormState = set(this.state.formState, path.split("."), value);
     this.setState({ formState: newFormState }, () => {
       this.props.onChange(this.state.formState);

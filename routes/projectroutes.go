@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -10,6 +11,7 @@ import (
 	"github.com/danielpquinn/crud-wizard-projects/lib"
 	"github.com/danielpquinn/crud-wizard-projects/models"
 	"github.com/gin-gonic/gin"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 // ListProjects lists all projects
@@ -92,10 +94,48 @@ func UpdateProject(c *gin.Context) {
 		var input models.Project
 		c.BindJSON(&input)
 
-		result, err := govalidator.ValidateStruct(&input)
+		_, validationError := govalidator.ValidateStruct(&input)
 
-		if !result {
+		if validationError != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": validationError.Error()})
+			return
+		}
+
+		resourcesJSON, err := json.Marshal(input.Resources)
+		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+
+		resourcesJSONString := gojsonschema.NewStringLoader(string(resourcesJSON))
+		resourcesJSONValidationResult, resourcesJSONValidationError := gojsonschema.Validate(models.ResourcesSchemaLoader, resourcesJSONString)
+
+		if resourcesJSONValidationError != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": resourcesJSONValidationError.Error()})
+			return
+		}
+
+		if !resourcesJSONValidationResult.Valid() {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": resourcesJSONValidationResult.Errors()[0].String()})
+			return
+		}
+
+		specsJSON, err := json.Marshal(input.Specs)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+
+		specsJSONString := gojsonschema.NewStringLoader(string(specsJSON))
+		specsJSONValidationResult, specsJSONValidationError := gojsonschema.Validate(models.SpecsSchemaLoader, specsJSONString)
+
+		if specsJSONValidationError != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": specsJSONValidationError.Error()})
+			return
+		}
+
+		if !specsJSONValidationResult.Valid() {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": specsJSONValidationResult.Errors()[0].String()})
 			return
 		}
 

@@ -7,11 +7,11 @@ import { Spec } from "src/types/swagger";
 let config: ProjectManager;
 
 class ProjectManager {
-  private resolvedSpecs: { [id: string]: Spec };
-  private config: IProject;
+  private resolvedSpecs: Array<{ id: string; spec: Spec }>;
+  private project: IProject;
 
   constructor() {
-    this.resolvedSpecs = {};
+    this.resolvedSpecs = [];
   }
 
   public async loadConfig(project: string): Promise<string | null> {
@@ -19,30 +19,36 @@ class ProjectManager {
 
     if (!response.data) { return null; }
 
-    this.config = {
-      specs: JSON.parse(response.data.specs),
-      resources: JSON.parse(response.data.resources),
+    this.project = {
+      name: response.data.name,
+      specs: response.data.specs,
+      resources: response.data.resources,
       getTotalResults: response.data.getTotalResults,
       initialize: response.data.initialize,
-      addPageParams: response.data.addPageParams
+      addPageParams: response.data.addPageParams,
+      signOut: response.data.signOut
     };
 
-    this.evalField(this.config, "initialize");
-    this.evalField(this.config, "getTotalResults");
-    this.evalField(this.config, "addPageParams");
+    this.evalField(this.project, "initialize");
+    this.evalField(this.project, "getTotalResults");
+    this.evalField(this.project, "addPageParams");
+    this.evalField(this.project, "signOut");
 
-    for (const resource of this.config.resources) {
+    for (const resource of this.project.resources) {
       this.evalField(resource, "getListItems");
     }
 
-    if (this.config.initialize) {
-      this.config.initialize(getAxios());
+    if (this.project.initialize) {
+      this.project.initialize(getAxios());
     }
 
     try {
-      Object.keys(this.config.specs).forEach((specId: string) => {
-        this.resolvedSpecs[specId] = resolveAllReferences(this.config.specs[specId]);
-      });
+      for (const spec of this.project.specs) {
+        this.resolvedSpecs.push({
+          id: spec.id,
+          spec: resolveAllReferences(spec.spec)
+        });
+      }
     } catch (e) {
       return e.message;
     }
@@ -50,24 +56,21 @@ class ProjectManager {
     return null;
   };
 
-  public getResolvedSpecs(): { [id: string]: Spec } {
-    return this.resolvedSpecs;
-  }
-
-  public getResolvedSpec(specId: string): Spec {
-    return this.resolvedSpecs[specId];
+  public getResolvedSpec(specId: string): Spec | null {
+    const resolvedSpec = this.resolvedSpecs.find(spec => spec.id === specId);
+    return resolvedSpec ? resolvedSpec.spec : null;
   }
 
   public getResource(resourceId: string) {
-    return this.config.resources.find(resource => resource.id === resourceId);
+    return this.project.resources.find(resource => resource.id === resourceId);
   }
 
   public getResources() {
-    return this.config.resources;
+    return this.project.resources;
   }
 
-  public getConfig(): IProject {
-    return this.config;
+  public getProject(): IProject {
+    return this.project;
   }
 
   private evalField(object: {}, field?: string) {

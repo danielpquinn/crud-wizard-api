@@ -148,6 +148,10 @@ export class Detail extends React.Component<IProps, IState> {
     const { getOperation, spec } = this.resource;
     const resolvedSpec = getProjectManager().getResolvedSpec(spec);
 
+    if (!resolvedSpec) {
+      return `Could not find spec with id ${spec}. Please make sure your resources.ts file is correct`;
+    }
+
     this.operation = findOperationObject(resolvedSpec, getOperation);
     
     if (!this.operation) {
@@ -172,6 +176,7 @@ export class Detail extends React.Component<IProps, IState> {
     }
 
     const resolvedSpec = getProjectManager().getResolvedSpec(this.resource.spec);
+    if (!resolvedSpec) { return; }
 
     if (this.resource.deleteOperation) {
       const operation = findOperationObject(resolvedSpec, this.resource.deleteOperation);
@@ -211,6 +216,7 @@ export class Detail extends React.Component<IProps, IState> {
       return;
     }
     const resolvedSpec = getProjectManager().getResolvedSpec(this.resource.spec);
+    if (!resolvedSpec) { return; }
     
     const args = {};
 
