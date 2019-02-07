@@ -43,8 +43,14 @@ var ResourcesSchemaLoader = gojsonschema.NewStringLoader(`{
 			"relationships": {
 				"type": "array",
 				"items": {
-					"type": "string",
-					"uniqueItems": true
+					"type": "object",
+					"properties": {
+						"resourceId": { "type": "string" },
+						"field": { "type": "string" },
+						"getId": { "type": "string" },
+						"many": { "type": "boolean" }
+					},
+					"required": ["resourceId", "field" ]
 				}
 			}
 		},

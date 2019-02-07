@@ -1,6 +1,7 @@
 import * as axios from "axios";
-import "codemirror/lib/codemirror.css";
 import * as React from "react";
+import "react-codemirror/node_modules/codemirror/lib/codemirror.css";
+import "react-codemirror/node_modules/codemirror/mode/javascript/javascript";
 import * as ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, RouteComponentProps, withRouter } from "react-router-dom";
 import { Desktop } from "src/components/Desktop";

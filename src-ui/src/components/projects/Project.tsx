@@ -57,6 +57,7 @@ export class Project extends React.Component<IProps, IState> {
     const id = this.props.match.params.id;
     const response = await axios.default.get(`http://localhost:8080/api/v1/projects/${id}`);
     const project = response.data;
+
     if (project.specs) {
       for (const spec of project.specs) {
         spec.spec = JSON.stringify(spec.spec);

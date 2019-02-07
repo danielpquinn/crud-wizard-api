@@ -205,3 +205,11 @@ nav.navigation.col-md-2.sidebar {
 .list-component .pagination {
   justify-content: center;
 }
+
+.code-input-height-100 .CodeMirror {
+  height: 100px;
+}
+
+.code-input-height-200 .CodeMirror {
+  height: 200px;
+}
