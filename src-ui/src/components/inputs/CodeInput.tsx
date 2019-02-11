@@ -4,7 +4,7 @@ import { Field } from "react-final-form";
 
 interface IProps {
   name: string;
-  label: string;
+  label?: string;
   mode: "javascript";
 }
 
@@ -17,8 +17,8 @@ export class CodeInput extends React.Component<IProps> {
       <Field
         name={name}
         render={({ input }) => (
-          <div className="form-group">
-            <label>{label}</label>
+          <div className="form-group code-input code-input-height-100 mb-1">
+            {label && <label className="mb-0"><small>{label}</small></label>}
             <CodeMirror
               value={input.value}
               onChange={input.onChange}

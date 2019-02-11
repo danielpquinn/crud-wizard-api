@@ -3,7 +3,7 @@ import { Field } from "react-final-form";
 
 interface IProps {
   name: string;
-  label: string;
+  label?: string;
 }
 
 export class TextArea extends React.Component<IProps> {
@@ -15,8 +15,8 @@ export class TextArea extends React.Component<IProps> {
       <Field
         name={name}
         render={({ input, meta }) => (
-          <div className="form-group">
-            <label>{label}</label>
+          <div className="form-group mb-1">
+            {label && <label className="mb-0"><small>{label}</small></label>}
             <textarea className="form-control form-control-sm" {...input} />
             {meta.touched && meta.error && <small>{meta.error}</small>}
           </div>

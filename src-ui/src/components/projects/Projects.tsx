@@ -87,7 +87,7 @@ export class Projects extends React.Component<{}, IState> {
             <h3>Projects</h3>
 
             <div className="card">
-              <div className="card-header">
+              <div className="card-header p-2">
                 <Link className="btn btn-primary" to="/create-project">Create Project</Link>
               </div>
               <div className="card-body">

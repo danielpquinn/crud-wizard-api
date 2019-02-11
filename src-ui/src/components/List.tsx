@@ -222,7 +222,6 @@ export class List extends React.Component<IProps, IState> {
           </div>
           <div>
             <Button level="link" onClick={() => this.loadPage(currentPage)}><i className="zmdi zmdi-refresh zmdi-hc-lg"/></Button>
-            <Button level="link" onClick={this.onClickSettings}><i className="zmdi zmdi-filter-list zmdi-hc-lg"/></Button>
             <Button level="link" onClick={this.onClickSettings}><i className="zmdi zmdi-settings zmdi-hc-lg"/></Button>
           </div>
         </div>
