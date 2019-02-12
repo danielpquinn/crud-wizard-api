@@ -68,7 +68,6 @@ export class Create extends React.Component<IProps, IState> {
     return this.resource && this.resource.createOperation ? (
       <div>
         <h4>Create {this.resource.name}</h4>
-        <hr/>
         <ParamForm
           defaults={defaultFormValues}
           resource={this.resource}

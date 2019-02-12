@@ -152,8 +152,8 @@ class NestedParamForm extends React.Component<INestedParamFormProps, INestedPara
       return (
         <div ref={this.myRef}>
           {path ? (
-            <div className="card mb-2">
-              <div className="d-flex card-header p-2" onClick={this.toggle}>
+            <div className="card mb-4">
+              <div className="d-flex card-header" onClick={this.toggle}>
                 <div className="mr-auto">{startCase(path)}</div>
                 <i className={`zmdi zmdi-chevron-${open ? "down" : "left"}`} />
               </div>

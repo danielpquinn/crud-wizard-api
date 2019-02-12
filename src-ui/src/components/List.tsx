@@ -335,7 +335,6 @@ export class List extends React.Component<IProps, IState> {
   private onClickCreate = () => {
     const { breadcrumbs, resourceId } = this.props;
     getWindowManager().addWindow(`create:${resourceId}`, WindowType.Create, { breadcrumbs, resourceId }, [ "breadcrumbs", "resourceId" ]);
-    getWindowManager().saveWindows();
   }
 
   private loadPage = async (page: number) => {

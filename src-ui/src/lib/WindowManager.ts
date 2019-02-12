@@ -5,6 +5,7 @@ import {
   headerHeight
 } from "src/constants";
 import { Publisher } from "src/lib/Publisher";
+import { getTweenManager } from "src/lib/TweenManager";
 
 const localStorageWindowsKey = "windowState";
 
@@ -54,17 +55,27 @@ class WindowManager extends Publisher<IWindows> {
       left: (window.innerWidth - defaultWindowWidth) / 2,
       props,
       savedProps,
-      top: headerHeight + 50,
+      top: 0,
       width: defaultWindowWidth,
       windowType,
     };
 
-    this.publish("updated", this.windows);
+    getTweenManager().addTween(this.windows[id], "top", headerHeight + 50, {
+      onStep: () => this.publish("updated", this.windows),
+      ease: "OutQuad",
+      onFinish: () => { this.saveWindows(); }
+    });
   }
 
   public removeWindow(id: string) {
-    delete this.windows[id];
-    this.publish("updated", this.windows);
+    getTweenManager().addTween(this.windows[id], "top", this.windows[id].top - 100, {
+      onStep: () => this.publish("updated", this.windows),
+      ease: "InQuad",
+      onFinish: () => {
+        delete this.windows[id];
+        this.saveWindows();
+      }
+    });
   }
 
   public getWindows(): IWindows {

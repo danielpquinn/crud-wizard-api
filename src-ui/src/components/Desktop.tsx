@@ -10,6 +10,7 @@ import { Window } from "src/components/Window";
 import { headerHeight } from "src/constants";
 import { resetAxios } from "src/lib/axiosManager";
 import { getProjectManager } from "src/lib/ProjectManager";
+import { getTweenManager } from "src/lib/TweenManager";
 import { getWindowManager, IWindows, WindowType } from "src/lib/WindowManager";
 
 interface IProps {
@@ -86,11 +87,20 @@ export class Desktop extends React.Component<IProps, IState> {
                 }}
                 onClose={() => {
                   getWindowManager().removeWindow(windowId);
-                  getWindowManager().saveWindows();
                 }}
                 onMaximize={() => {
-                  getWindowManager().updateWindow(windowId, { left: 0, top: headerHeight, width: innerWidth, height: innerHeight - headerHeight });
-                  getWindowManager().saveWindows();
+                  const innerWindow = getWindowManager().getWindow(windowId);
+                  getTweenManager().addTween(innerWindow, "left", 0);
+                  getTweenManager().addTween(innerWindow, "top", headerHeight);
+                  getTweenManager().addTween(innerWindow, "width", innerWidth);
+                  getTweenManager().addTween(innerWindow, "height", innerHeight, {
+                    onStep: () => {
+                      getWindowManager().updateWindow(windowId, {});
+                    },
+                    onFinish: () => {
+                      getWindowManager().saveWindows();
+                    }
+                  });
                 }}
                 onMinimize={() => {
                   getWindowManager().updateWindow(windowId, { left: (innerWidth / 2) - 300, top: headerHeight + 50, width: 600, height: 400 });

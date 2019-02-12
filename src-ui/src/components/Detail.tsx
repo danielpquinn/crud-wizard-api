@@ -101,8 +101,6 @@ export class Detail extends React.Component<IProps, IState> {
                           breadcrumbs: breadcrumbs.concat([{ param: this.resource.parameterName, value: id }]),
                           resourceId: relatedResource.id
                         }, [ "resourceId", "breadcrumbs" ]);
-
-                        getWindowManager().saveWindows();
                       }}
                     >
                       {relatedResource.namePlural}

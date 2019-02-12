@@ -52,7 +52,6 @@ export class Navigation extends React.Component<{}, IState> {
                       breadcrumbs: [],
                       resourceId: resource.id
                     }, [ "breadcrumbs", "resourceId" ]);
-                    getWindowManager().saveWindows();
                   }}
                 >
                   {resource.namePlural}

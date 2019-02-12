@@ -127,7 +127,7 @@ export class ProjectForm extends React.Component<IProps, IState> {
                           <>
                             {fields.map((name, index) => (
                               <div className="card mb-4 bg-light" key={index}>
-                                <div className="card-header d-flex p-2">
+                                <div className="card-header d-flex">
                                   <div className="flex-grow-1 mr-3"><TextInput name={`${name}.name`} /></div>
                                   <button
                                     className="btn btn-sm btn-secondary"
@@ -248,7 +248,7 @@ export class ProjectForm extends React.Component<IProps, IState> {
                   )}
                 </div>
               </div>
-              <div className="card-footer p-2">
+              <div className="card-footer">
                 <button className="btn btn-primary" type="submit">Save changes</button>
               </div>
             </form>
