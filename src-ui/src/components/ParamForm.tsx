@@ -183,7 +183,7 @@ class NestedParamForm extends React.Component<INestedParamFormProps, INestedPara
     if (schema.enum) {
       return (
         <select
-          className="form-control form-control-sm"
+          className="form-control"
           value={value}
           onChange={(e) => { onChange(path, e.target.value); }}
         >
@@ -197,7 +197,7 @@ class NestedParamForm extends React.Component<INestedParamFormProps, INestedPara
     if (schema.type === "integer") {
       return (
         <input
-          className="form-control form-control-sm"
+          className="form-control"
           type="number"
           onChange={(e) => {
             onChange(path, parseInt(e.target.value, 10))
@@ -209,7 +209,7 @@ class NestedParamForm extends React.Component<INestedParamFormProps, INestedPara
 
     return (
       <input
-        className="form-control form-control-sm"
+        className="form-control"
         type="text"
         onChange={(e) => { onChange(path, e.target.value) }}
         value={value || ""}

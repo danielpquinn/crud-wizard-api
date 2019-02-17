@@ -1,24 +1,6 @@
-$theme-colors: (
-  "primary": #0000ff,
-  "danger": #ff4136
-);
-
-$border-radius: 0;
-$border-radius-sm: 0;
-$border-radius-lg: 0;
-
-$spacer: 0.5rem;
-$card-spacer-x: 0.75rem;
-$card-spacer-y: 0.5rem;
-
-$input-btn-padding-x: 0.75rem;
-$input-btn-padding-y: 0.25rem;
-$input-btn-padding-x-sm: 0.75rem;
-$input-btn-padding-y-sm: 0.25rem;
-$input-btn-padding-x-lg: 0.75rem;
-$input-btn-padding-y-lg: 0.25rem;
-
+@import "variables.scss";
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "bootswatch.scss";
 
 html,
 body,
@@ -28,17 +10,10 @@ body,
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Nunito', sans-serif;
-}
-
-body {
-  font-family: 'Nunito', sans-serif;
+  background: $gray-200;
 }
 
 .desktop {
-  background-color: #eeeeee;
   width: 100%;
   height: 100%;
 }
@@ -50,19 +25,8 @@ body {
   left: 0;
   width: 220px;
   transition: margin-left 0.2s;
-  background-color: white;
-  border-right: 1px solid #cccccc;
-}
-
-.header {
-  height: 38px;
-  background-color: white;
-  border-bottom: 1px solid #cccccc;
-  padding-right: 1rem;
-}
-
-.dropdown-item.active, .dropdown-item:active {
-  background-color: #000099;
+  background-color: $gray-100;
+  border-right: 1px solid $gray-400;
 }
 
 .window-header {
@@ -82,6 +46,10 @@ body {
     max-width: none;
     margin: 0;
   }
+}
+
+.modal.active .modal-content {
+  border: 1px solid $info;
 }
 
 .modal-body {
@@ -124,10 +92,6 @@ body {
 
 .loading {
   padding: 1rem 0;
-}
-
-.form-control:focus {
-  border-color: #0000ff;
 }
 
 nav.navigation.col-md-2.sidebar {

@@ -1,12 +1,9 @@
+.code-input .ReactCodeMirror {
+  height: 100%;
+}
+
 .code-input .CodeMirror {
   border: 1px solid #ced4da;
   border-radius: .2rem;
-}
-
-.code-input-height-100 .CodeMirror {
-  height: 100px;
-}
-
-.code-input-height-200 .CodeMirror {
-  height: 200px;
+  height: 100%;
 }

@@ -145,6 +145,14 @@
   version = "1.0.1"
 
 [[projects]]
+  digest = "1:1a44c28f6de12e934afea5ff48ccd61a779526dc587afb60f30ebbfae838c2fd"
+  name = "github.com/qor/validations"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "87c1296c75e72a8f3247beab65c48c50b7b66a7a"
+  version = "v1.0"
+
+[[projects]]
   digest = "1:274f67cb6fed9588ea2521ecdac05a6d62a8c51c074c1fccc6a49a40ba80e925"
   name = "github.com/satori/go.uuid"
   packages = ["."]
@@ -230,6 +238,7 @@
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
+    "github.com/qor/validations",
     "github.com/satori/go.uuid",
     "github.com/xeipuuv/gojsonschema",
     "golang.org/x/crypto/bcrypt",

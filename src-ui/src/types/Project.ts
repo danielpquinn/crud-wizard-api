@@ -7,6 +7,7 @@ import { Spec } from "src/types/swagger";
  * Project configuration provided by users
  */
 export interface IProject {
+  id: string;
   name: string;
   getTotalResults: (response: AxiosResponse) => number;
   addPageParams: (

@@ -2,6 +2,7 @@ import * as axios from "axios";
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { Alert } from "src/components/Alert";
+import { getConfigManager } from 'src/lib/ConfigManager';
 import { getErrorMessage } from "src/lib/error";
 import { getToastManager } from "src/lib/ToastManager";
 import { IProjectResponseBody } from "src/types/ProjectResponseBody";
@@ -48,18 +49,18 @@ export class Projects extends React.Component<{}, IState> {
               return (
                 <tr key={project.id}>
                   <td className="align-middle">{project.name}</td>
-                  <td className="align-middle"><Link to={`/desktop/${project.id}`}>{window.location.protocol}//{window.location.host}/desktop/{project.id}</Link></td>
+                  <td className="align-middle"><Link to={`/desktop/${project.id}`}>Go to desktop</Link></td>
                   <td className="align-middle text-right">
                     <Link
                       title="Edit project"
-                      className="btn"
+                      className="btn btn-lg btn-link"
                       to={`/projects/${project.id}`}
                     >
                       <i className="zmdi zmdi-edit" />
                     </Link>
                     <a
                       title="Delete project"
-                      className="btn"
+                      className="btn btn-lg btn-link"
                       onClick={() => this.deleteProject(project.id)}
                       href="javascript:void(0);"
                     >
@@ -88,7 +89,7 @@ export class Projects extends React.Component<{}, IState> {
 
             <div className="card">
               <div className="card-header">
-                <Link className="btn btn-primary" to="/create-project">Create Project</Link>
+                <Link className="btn btn-primary btn-sm" to="/create-project">Create Project</Link>
               </div>
               <div className="card-body">
                 {content}
@@ -102,7 +103,7 @@ export class Projects extends React.Component<{}, IState> {
 
   private loadProjects = async () => {
     try {
-      const response = await axios.default.get("http://localhost:8080/api/v1/projects/");
+      const response = await axios.default.get(`${getConfigManager().getConfig().apiBaseUrl}/api/v1/projects/`);
       if (response.data) {
         this.setState({ projects: response.data });
       }
@@ -114,7 +115,7 @@ export class Projects extends React.Component<{}, IState> {
   private deleteProject = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       try {
-        const response = await axios.default.delete(`http://localhost:8080/api/v1/projects/${id}`);
+        const response = await axios.default.delete(`${getConfigManager().getConfig().apiBaseUrl}/api/v1/projects/${id}`);
     
         if (response.status < 400) {
           this.loadProjects();

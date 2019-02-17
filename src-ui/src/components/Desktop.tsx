@@ -103,8 +103,18 @@ export class Desktop extends React.Component<IProps, IState> {
                   });
                 }}
                 onMinimize={() => {
-                  getWindowManager().updateWindow(windowId, { left: (innerWidth / 2) - 300, top: headerHeight + 50, width: 600, height: 400 });
-                  getWindowManager().saveWindows();
+                  const innerWindow = getWindowManager().getWindow(windowId);
+                  getTweenManager().addTween(innerWindow, "left", (innerWidth / 2) - 300);
+                  getTweenManager().addTween(innerWindow, "top", headerHeight + 50);
+                  getTweenManager().addTween(innerWindow, "width", 600);
+                  getTweenManager().addTween(innerWindow, "height", 400, {
+                    onStep: () => {
+                      getWindowManager().updateWindow(windowId, {});
+                    },
+                    onFinish: () => {
+                      getWindowManager().saveWindows();
+                    }
+                  });
                 }}
               >
                 {this.getModalComponent(windowId)}

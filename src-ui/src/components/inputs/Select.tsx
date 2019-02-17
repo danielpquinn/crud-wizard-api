@@ -22,7 +22,7 @@ export class Select extends React.Component<IProps> {
         name={name}
         render={({ input, meta }) => (
           <div className="form-inline form-group mb-1">
-            {label && <label className="mb-0"><small>{label}</small></label>}
+            {label && <label>{label}</label>}
             <ReactSelect
               styles={{
                 container: (provided) => ({ ...provided, width: "100%" }),

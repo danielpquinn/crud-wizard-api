@@ -4,6 +4,7 @@ import * as React from "react";
 import { Field, Form as FinalForm } from "react-final-form";
 import { Link } from "react-router-dom";
 import { Home } from "src/Home";
+import { getConfigManager } from './lib/ConfigManager';
 
 interface IProps {
   history: H.History;
@@ -61,7 +62,7 @@ export class SignUp extends React.Component<IProps, IState> {
                 render={({ input, meta }) => (
                   <div className="form-group">
                     <label>Email</label>
-                    <input placeholder="Enter email address" className="form-control form-control-sm" {...input} />
+                    <input placeholder="Enter email address" className="form-control" {...input} />
                     {meta.touched && meta.error && <small className="text-danger">{meta.error}</small>}
                   </div>
                 )}
@@ -72,7 +73,7 @@ export class SignUp extends React.Component<IProps, IState> {
                 render={({ input, meta }) => (
                   <div className="form-group">
                     <label>Password</label>
-                    <input placeholder="Enter password" type="password" className="form-control form-control-sm" {...input} />
+                    <input placeholder="Enter password" type="password" className="form-control" {...input} />
                     {meta.touched && meta.error && <small className="text-danger">{meta.error}</small>}
                   </div>
                 )}
@@ -102,7 +103,7 @@ export class SignUp extends React.Component<IProps, IState> {
     this.setState({ disabled: true });
 
     try {
-      response = await axios.default.post("http://localhost:8080/api/v1/users", {
+      response = await axios.default.post(`${getConfigManager().getConfig().apiBaseUrl}/api/v1/users`, {
         email: values.email,
         password: values.password
       });
@@ -114,7 +115,7 @@ export class SignUp extends React.Component<IProps, IState> {
       response
     });
 
-    if (response.data && response.data.token) {
+    if (response && response.data && response.data.token) {
       localStorage.setItem("authToken", response.data.token);
       this.props.history.push("/projects");
     }

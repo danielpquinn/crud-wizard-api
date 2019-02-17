@@ -4,6 +4,7 @@ import { cloneDeep } from "lodash";
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { ProjectForm } from "src/components/projects/ProjectForm";
+import { getConfigManager } from "src/lib/ConfigManager";
 import { getErrorMessage } from "src/lib/error";
 import { getToastManager } from "src/lib/ToastManager";
 
@@ -66,7 +67,7 @@ export class CreateProject extends React.Component<IProps, IState> {
     }
 
     try {
-      await axios.default.post("http://localhost:8080/api/v1/projects/", parsedValues);
+      await axios.default.post(`${getConfigManager().getConfig().apiBaseUrl}/api/v1/projects/`, parsedValues);
       getToastManager().addToast(`Created project "${parsedValues.name}"`, "success");
       this.props.history.push("/projects");
     } catch (e) {

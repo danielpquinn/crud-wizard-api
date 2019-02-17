@@ -3,6 +3,7 @@ import { getAxios } from "src/lib/axiosManager";
 import { resolveAllReferences } from "src/lib/swagger";
 import { IProject } from "src/types/Project";
 import { Spec } from "src/types/swagger";
+import { getConfigManager } from './ConfigManager';
 
 let config: ProjectManager;
 
@@ -15,11 +16,12 @@ class ProjectManager {
   }
 
   public async loadConfig(project: string): Promise<string | null> {
-    const response = await axios.default.get(`http://localhost:8080/api/v1/projects/${project}`);
+    const response = await axios.default.get(`${getConfigManager().getConfig().apiBaseUrl}/api/v1/projects/${project}`);
 
     if (!response.data) { return null; }
 
     this.project = {
+      id: response.data.id,
       name: response.data.name,
       specs: response.data.specs,
       resources: response.data.resources,

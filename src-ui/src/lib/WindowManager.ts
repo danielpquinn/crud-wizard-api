@@ -8,6 +8,7 @@ import { Publisher } from "src/lib/Publisher";
 import { getTweenManager } from "src/lib/TweenManager";
 
 const localStorageWindowsKey = "windowState";
+const addWindowOffset = 20;
 
 export enum WindowType {
   Create,
@@ -42,6 +43,16 @@ class WindowManager extends Publisher<IWindows> {
   }
 
   public addWindow(id: string, windowType: WindowType, props: any, savedProps: string[]) {
+    const activeWindowKey = Object.keys(this.windows).filter(key => this.windows[key].active)[0];
+    const activeWindow = activeWindowKey ? this.windows[activeWindowKey] : null;
+
+    let top = headerHeight + addWindowOffset;
+    let left = (window.innerWidth - defaultWindowWidth) / 2;
+
+    if (activeWindow) {
+      top = activeWindow.top + addWindowOffset;
+      left = activeWindow.left + addWindowOffset;
+    }
 
     Object.keys(this.windows).forEach((windowId: string) => {
       this.windows[windowId].active = false;
@@ -52,15 +63,16 @@ class WindowManager extends Publisher<IWindows> {
       active: true,
       height: defaultWindowHeight,
       index: 0,
-      left: (window.innerWidth - defaultWindowWidth) / 2,
+      left: left - addWindowOffset,
       props,
       savedProps,
-      top: 0,
+      top: top - addWindowOffset,
       width: defaultWindowWidth,
       windowType,
     };
 
-    getTweenManager().addTween(this.windows[id], "top", headerHeight + 50, {
+    getTweenManager().addTween(this.windows[id], "left", left, { ease: "OutQuad" });
+    getTweenManager().addTween(this.windows[id], "top", top, {
       onStep: () => this.publish("updated", this.windows),
       ease: "OutQuad",
       onFinish: () => { this.saveWindows(); }
@@ -68,12 +80,17 @@ class WindowManager extends Publisher<IWindows> {
   }
 
   public removeWindow(id: string) {
-    getTweenManager().addTween(this.windows[id], "top", this.windows[id].top - 100, {
+    getTweenManager().addTween(this.windows[id], "top", this.windows[id].top - addWindowOffset, {
       onStep: () => this.publish("updated", this.windows),
-      ease: "InQuad",
+      ease: "InOutQuad",
       onFinish: () => {
         delete this.windows[id];
+        const activeWindow = Object.keys(this.windows).map(key => this.windows[key]).sort((a, b) => a.index < b.index ? -1 : 1)[0];
+        if (activeWindow) {
+          activeWindow.active = true;
+        }
         this.saveWindows();
+        this.publish("updated", this.windows);
       }
     });
   }

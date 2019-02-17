@@ -4,20 +4,21 @@ import { Field } from "react-final-form";
 interface IProps {
   name: string;
   label?: string;
+  placeholder?: string;
 }
 
 export class TextInput extends React.Component<IProps> {
 
   public render() {
-    const { name, label } = this.props;
+    const { name, label, placeholder } = this.props;
 
     return (
       <Field
         name={name}
         render={({ input, meta }) => (
           <div className="form-group mb-1">
-            {label && <label className="mb-0"><small>{label}</small></label>}
-            <input className="form-control form-control-sm" {...input} />
+            {label && <label>{label}</label>}
+            <input className="form-control" {...input} placeholder={placeholder} />
             {meta.touched && meta.error && <small>{meta.error}</small>}
           </div>
         )}

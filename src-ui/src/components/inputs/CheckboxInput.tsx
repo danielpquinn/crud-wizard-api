@@ -16,8 +16,8 @@ export class CheckboxInput extends React.Component<IProps> {
         name={name}
         render={({ input, meta }) => (
           <div className="form-group mb-1">
-            {label && <label className="mb-0"><small>{label}</small></label>}
-            <input type="checkbox" className="form-control form-control-sm" {...input} />
+            {label && <label>{label}</label>}
+            <input type="checkbox" className="form-control" {...input} />
             {meta.touched && meta.error && <small>{meta.error}</small>}
           </div>
         )}

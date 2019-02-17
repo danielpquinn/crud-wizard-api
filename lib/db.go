@@ -3,6 +3,7 @@ package lib
 import (
 	"github.com/danielpquinn/crud-wizard-projects/models"
 	"github.com/jinzhu/gorm"
+	"github.com/qor/validations"
 )
 
 // Database connection shared by other packages in application
@@ -16,6 +17,8 @@ func InitializeDatabase() {
 	if err != nil {
 		panic(err)
 	}
+
+	validations.RegisterCallbacks(Database)
 
 	Database.LogMode(true)
 	Database.AutoMigrate(&models.User{})

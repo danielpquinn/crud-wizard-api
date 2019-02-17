@@ -1,9 +1,11 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import { getNavigationManager } from "src/lib/NavigationManager";
 import { getProjectManager } from "src/lib/ProjectManager";
 
 interface IState {
   accountOpen: boolean;
+  settingsOpen: boolean;
 }
 
 /**
@@ -17,48 +19,70 @@ export class Header extends React.Component<{}, IState> {
     super(props);
 
     this.state = {
-      accountOpen: false
+      accountOpen: false,
+      settingsOpen: false
     };
   }
 
+  public componentDidMount() {
+    document.addEventListener("keyup", this.onKeyUp);
+  }
+
+  public componentWillUnmount() {
+    document.removeEventListener("keyup", this.onKeyUp);
+  }
+
   public render() {
-    const { accountOpen } = this.state;
+    const { accountOpen, settingsOpen } = this.state;
     const project = getProjectManager().getProject();
     const signOut = project.signOut;
 
     // tslint:disable:jsx-no-lambda
     return (
-      <header className="header d-flex align-items-start">
-        <div className="mr-auto">
-          <a
-            className="btn btn-link"
-            href="javascript:void(0);"
-            onClick={this.toggleMenuOpen}
-          >
-            <i className="zmdi zmdi-menu"/>
-          </a>
-        </div>
-        {signOut && (
-          <div className="text-right">
-            <ul className="navbar-nav">
-              <li className={`nav-item dropdown ${accountOpen ? "show" : ""}`}>
-                <a
-                  href="javascript:void(0);"
-                  className="nav-link dropdown-toggle"
-                  role="button"
-                  aria-haspopup="true"
-                  aria-expanded={accountOpen}
-                  onClick={this.toggleAccountOpen}
-                >
-                  <i className="zmdi zmdi-account-o"/>
-                </a>
-                <div className={`dropdown-menu dropdown-menu-right ${accountOpen ? "show" : ""}`}>
-                  <a className="dropdown-item" href="javascript:void(0);" onClick={signOut}>Sign out</a>
-                </div>
-              </li>
-            </ul>
-          </div>
-        )}
+      <header className="navbar p-0 border-0 navbar-expand-lg bg-light">
+        <button
+          className="btn-link navbar-toggler mr-auto d-block"
+          type="button"
+          aria-controls="navbarNavDropdown"
+          aria-label="Toggle navigation"
+          onClick={this.toggleMenuOpen}
+        >
+          <i className="zmdi zmdi-menu"/>
+        </button>
+        <ul className="navbar-nav">
+          <li className={`nav-item dropdown ${settingsOpen ? "show" : ""}`}>
+            <a
+              href="javascript:void(0);"
+              className="nav-link dropdown-toggle p-2"
+              role="button"
+              aria-haspopup="true"
+              aria-expanded={settingsOpen}
+              onClick={this.toggleSettingsOpen}
+            >
+              <i className="zmdi zmdi-settings"/>
+            </a>
+            <div className={`dropdown-menu dropdown-menu-right ${settingsOpen ? "show" : ""}`}>
+              <Link className="dropdown-item" to={`/projects/${project.id}`}>Edit project</Link>
+            </div>
+          </li>
+          {signOut && (
+            <li className={`nav-item dropdown ${accountOpen ? "show" : ""}`}>
+              <a
+                href="javascript:void(0);"
+                className="nav-link dropdown-toggle p-2"
+                role="button"
+                aria-haspopup="true"
+                aria-expanded={accountOpen}
+                onClick={this.toggleAccountOpen}
+              >
+                <i className="zmdi zmdi-account"/>
+              </a>
+              <div className={`dropdown-menu dropdown-menu-right ${accountOpen ? "show" : ""}`}>
+                <a className="dropdown-item" href="javascript:void(0);" onClick={signOut}>Sign out</a>
+              </div>
+            </li>
+          )}
+        </ul>
       </header>
     );
   }
@@ -66,7 +90,7 @@ export class Header extends React.Component<{}, IState> {
   /**
    * Toggle menu visibility
    */
-  private toggleMenuOpen = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  private toggleMenuOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     getNavigationManager().toggle();
@@ -91,17 +115,46 @@ export class Header extends React.Component<{}, IState> {
     });
   }
 
+  /**
+   * Toggle settings menu visibility
+   */
+  private toggleSettingsOpen = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.stopPropagation();
+
+    this.setState({
+      settingsOpen: !this.state.settingsOpen
+    }, () => {
+      if (this.state.settingsOpen) {
+        window.addEventListener("click", this.onWindowClick);
+      }
+    });
+  }
+
+  /**
+   * Close all menus when escape key is pressed
+   */
+  private onKeyUp = (e: KeyboardEvent) => {
+    if (e.keyCode === 27) {
+      this.closeMenus();
+    }
+
+    if (getNavigationManager().getMenuOpen()) {
+      getNavigationManager().toggle();
+    }
+  }
+
   private onWindowClick = (e: MouseEvent) => {
-    this.closeAccountMenu();
+    this.closeMenus();
     if (getNavigationManager().getMenuOpen()) {
       getNavigationManager().toggle();
     }
     window.removeEventListener("click", this.onWindowClick);
   }
 
-  private closeAccountMenu() {
+  private closeMenus() {
     this.setState({
-      accountOpen: false
+      accountOpen: false,
+      settingsOpen: false
     });
   }
 }

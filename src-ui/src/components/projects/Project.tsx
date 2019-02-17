@@ -3,6 +3,7 @@ import { cloneDeep } from "lodash";
 import * as React from "react";
 import { Link, match } from "react-router-dom";
 import { ProjectForm } from "src/components/projects/ProjectForm";
+import { getConfigManager } from "src/lib/ConfigManager";
 import { getErrorMessage } from "src/lib/error";
 import { getToastManager } from "src/lib/ToastManager";
 import { IProjectResponseBody } from "src/types/ProjectResponseBody";
@@ -55,12 +56,12 @@ export class Project extends React.Component<IProps, IState> {
 
   private loadProject = async () => {
     const id = this.props.match.params.id;
-    const response = await axios.default.get(`http://localhost:8080/api/v1/projects/${id}`);
+    const response = await axios.default.get(`${getConfigManager().getConfig().apiBaseUrl}/api/v1/projects/${id}`);
     const project = response.data;
 
     if (project.specs) {
       for (const spec of project.specs) {
-        spec.spec = JSON.stringify(spec.spec);
+        spec.spec = JSON.stringify(spec.spec, null, 2);
       }
     }
     this.setState({ project });
@@ -84,7 +85,7 @@ export class Project extends React.Component<IProps, IState> {
 
     const id = this.props.match.params.id;
     try {
-      await axios.default.put(`http://localhost:8080/api/v1/projects/${id}`, parsedValues);
+      await axios.default.put(`${getConfigManager().getConfig().apiBaseUrl}/api/v1/projects/${id}`, parsedValues);
       getToastManager().addToast(`Edited project "${parsedValues.name}"`, "success");
     } catch (e) {
       getToastManager().addToast(`Error updating project ${parsedValues.name}: ${getErrorMessage(e)}`, "danger");
