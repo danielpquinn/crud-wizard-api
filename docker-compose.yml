@@ -1,13 +1,15 @@
 version: "3"
 services:
   web:
-    image: crudwizard/ui
+    build: ./src-ui
     ports:
       - "3000:80"
   api:
-    image: crudwizard/api
+    build: .
     ports:
       - "8080:8080"
+    environment:
+      POSTGRESS_CONNECTION_STRING: "host=db user=crudwizard password=crudwizard dbname=crudwizard sslmode=disable"
     depends_on:
       - "db"
   db:

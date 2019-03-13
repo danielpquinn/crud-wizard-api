@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"os"
+
 	"github.com/danielpquinn/crud-wizard-projects/models"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/validations"
@@ -12,7 +14,8 @@ var Database *gorm.DB
 // InitializeDatabase -  database connection, configure and perform migrations
 func InitializeDatabase() {
 	var err error
-	Database, err = gorm.Open("postgres", "user=crudwizard password=crudwizard dbname=crudwizard sslmode=disable")
+	connectionString := os.Getenv("POSTGRESS_CONNECTION_STRING")
+	Database, err = gorm.Open("postgres", connectionString)
 
 	if err != nil {
 		panic(err)
