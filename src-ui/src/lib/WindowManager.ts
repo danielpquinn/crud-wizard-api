@@ -25,6 +25,7 @@ interface IWindow {
   savedProps: string[];
   top: number;
   width: number;
+  opacity: number;
   windowType: WindowType;
 }
 
@@ -69,13 +70,20 @@ class WindowManager extends Publisher<IWindows> {
       top: top - addWindowOffset,
       width: defaultWindowWidth,
       windowType,
+      opacity: 0
     };
 
-    getTweenManager().addTween(this.windows[id], "left", left, { ease: "OutQuad" });
-    getTweenManager().addTween(this.windows[id], "top", top, {
+    getTweenManager().addTween(this.windows[id], "opacity", 1, {
       onStep: () => this.publish("updated", this.windows),
       ease: "OutQuad",
-      onFinish: () => { this.saveWindows(); }
+      onFinish: () => {
+        getTweenManager().addTween(this.windows[id], "left", left, { ease: "OutQuad" });
+        getTweenManager().addTween(this.windows[id], "top", top, {
+          onStep: () => this.publish("updated", this.windows),
+          ease: "OutQuad",
+          onFinish: () => { this.saveWindows(); }
+        });
+      }
     });
   }
 
@@ -84,13 +92,17 @@ class WindowManager extends Publisher<IWindows> {
       onStep: () => this.publish("updated", this.windows),
       ease: "InOutQuad",
       onFinish: () => {
-        delete this.windows[id];
-        const activeWindow = Object.keys(this.windows).map(key => this.windows[key]).sort((a, b) => a.index < b.index ? -1 : 1)[0];
-        if (activeWindow) {
-          activeWindow.active = true;
-        }
-        this.saveWindows();
-        this.publish("updated", this.windows);
+        getTweenManager().addTween(this.windows[id], "opacity", 0, {
+          onStep: () => this.publish("updated", this.windows),
+          ease: "OutQuad",
+          onFinish: () => {
+            delete this.windows[id];
+            const activeWindow = Object.keys(this.windows).map(key => this.windows[key]).sort((a, b) => a.index < b.index ? -1 : 1)[0];
+            if (activeWindow) {
+              activeWindow.active = true;
+            }
+          }
+        });
       }
     });
   }
@@ -136,6 +148,7 @@ class WindowManager extends Publisher<IWindows> {
         top: window.top,
         width: window.width,
         windowType: window.windowType,
+        opacity: window.opacity
       };
       return last;
     }, {});

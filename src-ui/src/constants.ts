@@ -1,4 +1,4 @@
-export const headerHeight = 35;
+export const headerHeight = 48;
 export const navigationWidth = 300;
 export const defaultWindowWidth = 600;
 export const defaultWindowHeight = 400;

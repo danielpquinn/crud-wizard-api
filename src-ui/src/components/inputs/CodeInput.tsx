@@ -7,12 +7,26 @@ interface IProps {
   label?: string;
   mode: "javascript";
   height?: number;
+  onBlur?: (instance: CodeMirror.Editor) => void;
 }
 
 export class CodeInput extends React.Component<IProps> {
+  private reactCodeMirrorInstance: ReactCodeMirror.ReactCodeMirror;
+  private listening: boolean;
+
+  constructor(props: IProps) {
+    super(props);
+    this.listening = false;
+  }
 
   public render() {
-    const { height, name, mode, label } = this.props;
+    const {
+      height,
+      label,
+      mode,
+      name,
+      onBlur
+    } = this.props;
 
     return (
       <Field
@@ -24,6 +38,13 @@ export class CodeInput extends React.Component<IProps> {
               style={{ height: height ? `${height}px` : "100px" }}
             >
               <CodeMirror
+                ref={(instance: ReactCodeMirror.ReactCodeMirror) => {
+                  this.reactCodeMirrorInstance = instance;
+                  if (onBlur && instance && !this.listening) {
+                    this.reactCodeMirrorInstance.getCodeMirror().on("blur" as any, onBlur);
+                    this.listening = true;
+                  }
+                }}
                 value={input.value}
                 onChange={input.onChange}
                 options={{ mode: `text/${mode}` }}
@@ -33,5 +54,12 @@ export class CodeInput extends React.Component<IProps> {
         )}
       />
     );
+  }
+
+  public componentWillUnmount() {
+    const { onBlur } = this.props;
+    if (this.reactCodeMirrorInstance && onBlur) {
+      this.reactCodeMirrorInstance.getCodeMirror().off("blur" as any, onBlur);
+    }
   }
 }

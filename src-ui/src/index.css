@@ -1293,7 +1293,7 @@ pre {
   font-size: 0.8125rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #7896A2;
+  color: #EFF5F5;
   background-color: #12141D;
   background-clip: padding-box;
   border: 1px solid #124155;
@@ -1306,9 +1306,9 @@ pre {
     background-color: transparent;
     border: 0; }
   .form-control:focus {
-    color: #7896A2;
+    color: #EFF5F5;
     background-color: #12141D;
-    border-color: #7bfffb;
+    border-color: #00CFFA;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0, 250, 242, 0.25); }
   .form-control::placeholder {
@@ -1319,7 +1319,7 @@ pre {
     opacity: 1; }
 
 select.form-control:focus::-ms-value {
-  color: #7896A2;
+  color: #EFF5F5;
   background-color: #12141D; }
 
 .form-control-file,
@@ -2490,7 +2490,7 @@ input[type="button"].btn-block {
   font-size: 0.8125rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #7896A2;
+  color: #EFF5F5;
   text-align: center;
   white-space: nowrap;
   background-color: #122B3A;
@@ -2573,7 +2573,7 @@ input[type="button"].btn-block {
   .custom-control-input:focus ~ .custom-control-label::before {
     box-shadow: 0 0 0 0.2rem rgba(0, 250, 242, 0.25); }
   .custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
-    border-color: #7bfffb; }
+    border-color: #00CFFA; }
   .custom-control-input:not(:disabled):active ~ .custom-control-label::before {
     color: #12141D;
     background-color: #aefffc;
@@ -2669,7 +2669,7 @@ input[type="button"].btn-block {
   padding: 0.375rem 1.75rem 0.375rem 0.75rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #7896A2;
+  color: #EFF5F5;
   vertical-align: middle;
   background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23A5BAC1' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
   background-color: #12141D;
@@ -2677,11 +2677,11 @@ input[type="button"].btn-block {
   border-radius: 0.25rem;
   appearance: none; }
   .custom-select:focus {
-    border-color: #7bfffb;
+    border-color: #00CFFA;
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(123, 255, 251, 0.5); }
+    box-shadow: 0 0 0 0.2rem rgba(0, 207, 250, 0.5); }
     .custom-select:focus::-ms-value {
-      color: #7896A2;
+      color: #EFF5F5;
       background-color: #12141D; }
   .custom-select[multiple], .custom-select[size]:not([size="1"]) {
     height: auto;
@@ -2722,7 +2722,7 @@ input[type="button"].btn-block {
   margin: 0;
   opacity: 0; }
   .custom-file-input:focus ~ .custom-file-label {
-    border-color: #7bfffb;
+    border-color: #00CFFA;
     box-shadow: 0 0 0 0.2rem rgba(0, 250, 242, 0.25); }
   .custom-file-input:disabled ~ .custom-file-label {
     background-color: #122B3A; }
@@ -2741,7 +2741,7 @@ input[type="button"].btn-block {
   padding: 0.375rem 0.75rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #7896A2;
+  color: #EFF5F5;
   background-color: #12141D;
   border: 1px solid #124155;
   border-radius: 0.25rem; }
@@ -2755,7 +2755,7 @@ input[type="button"].btn-block {
     height: 1.96875rem;
     padding: 0.375rem 0.75rem;
     line-height: 1.5;
-    color: #7896A2;
+    color: #EFF5F5;
     content: "Browse";
     background-color: #122B3A;
     border-left: inherit;

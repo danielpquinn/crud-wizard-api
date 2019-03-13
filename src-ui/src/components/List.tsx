@@ -105,10 +105,10 @@ export class List extends React.Component<IProps, IState> {
 
     const idField = this.resource.idField;
     const { getListItems } = this.resource;
-    const columnWidth = visibleColumns ? Math.floor(100 / Object.keys(visibleColumns).length) : 100;
-    let table: JSX.Element;
-    let rows: JSX.Element[] | null = null;
-    let error: JSX.Element | null = null;
+    const columnWidth = visibleColumns ? Math.floor(100 / (Object.keys(visibleColumns).length || 1)) : 100;
+    let table: React.ReactNode;
+    let rows: React.ReactNode[] | null = null;
+    let error: React.ReactNode | null = null;
 
     if (axiosResponse && axiosResponse.status >= 400) {
       error = <Alert level="danger"><JsonViewer value={axiosResponse.data}/></Alert>;

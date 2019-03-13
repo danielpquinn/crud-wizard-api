@@ -1,3 +1,4 @@
+import { FormApi } from 'final-form';
 import arrayMutators from "final-form-arrays";
 import * as React from "react";
 import { Form as FinalForm } from "react-final-form";
@@ -6,9 +7,19 @@ import { CheckboxInput } from "src/components/inputs/CheckboxInput";
 import { CodeInput } from "src/components/inputs/CodeInput";
 import { Select } from "src/components/inputs/Select";
 import { TextInput } from "src/components/inputs/TextInput";
+import { getOperations, resolveAllReferences } from "src/lib/swagger";
+
+interface IOption {
+  label: string; value: string
+}
+
+interface ISpecValue {
+  id: string;
+  spec: string;
+};
 
 interface IProps {
-  initialValues: object | undefined;
+  initialValues: any;
   onSubmit: (values: object) => any;
 }
 
@@ -16,6 +27,7 @@ type tabIds = "general" | "specs" | "resources" | "advanced";
 
 interface IState {
   selectedTab: tabIds;
+  operationOptions: { [id: string]: IOption[] };
 }
 
 export class ProjectForm extends React.Component<IProps, IState> {
@@ -24,13 +36,20 @@ export class ProjectForm extends React.Component<IProps, IState> {
     super(props);
 
     this.state = {
+      operationOptions: {},
       selectedTab: "general"
     };
   }
 
+  public componentDidMount() {
+    const { initialValues } = this.props;
+    const specs = initialValues && initialValues.specs;
+    if (specs) { this.setOperationOptions(specs); }
+  }
+
   public render() {
     const { initialValues, onSubmit } = this.props;
-    const { selectedTab } = this.state;
+    const { selectedTab, operationOptions } = this.state;
 
     return (
       <FinalForm
@@ -85,6 +104,9 @@ export class ProjectForm extends React.Component<IProps, IState> {
                                   label="OpenAPI specification file (JSON format)"
                                   mode="javascript"
                                   height={600}
+                                  onBlur={(_) => {
+                                    this.onSpecBlur(form);
+                                  }}
                                 />
                               </div>
                             </div>
@@ -105,107 +127,120 @@ export class ProjectForm extends React.Component<IProps, IState> {
                       name="resources"
                       render={({ fields }) => (
                         <>
-                          {fields.map((name, index) => (
-                            <div className="card mb-4 bg-light" key={index}>
-                              <div className="card-header d-flex">
-                                <div className="flex-grow-1 mr-3"><TextInput name={`${name}.name`} label="Resource name" /></div>
-                                <button
-                                  className="btn btn-sm btn-secondary"
-                                  type="button"
-                                  onClick={() => fields.remove(index)}
-                                >
-                                  <i className="zmdi zmdi-delete" />
-                                </button>
-                              </div>
-                              <div className="card-body">
-                                <table className="mb-3 w-100">
-                                  <tbody>
-                                    <tr>
-                                      <td className="text-right pr-1">OpenAPI Spec</td>
-                                      <td className="pr-3"><Select options={specOptions} name={`${name}.spec`} /></td>
-                                      <td className="text-right pr-1">ID</td>
-                                      <td className="pr-3"><TextInput name={`${name}.id`} /></td>
-                                      <td className="text-right pr-1">ID Field</td>
-                                      <td><TextInput name={`${name}.idField`}/></td>
-                                    </tr>
-                                    <tr>
-                                      <td className="text-right pr-1">Create Operation</td>
-                                      <td className="pr-3"><TextInput name={`${name}.createOperation`} /></td>
-                                      <td className="text-right pr-1">List Operation</td>
-                                      <td className="pr-3"><TextInput name={`${name}.listOperation`}/></td>
-                                      <td className="text-right pr-1">Get Operation</td>
-                                      <td><TextInput name={`${name}.getOperation`}/></td>
-                                    </tr>
-                                    <tr>
-                                      <td className="text-right pr-1">Delete Operation</td>
-                                      <td className="pr-3"><TextInput name={`${name}.deleteOperation`} /></td>
-                                      <td className="text-right pr-1">Parameter Name</td>
-                                      <td className="pr-3"><TextInput name={`${name}.parameterName`}/></td>
-                                      <td className="text-right pr-1">Get List Items</td>
-                                      <td><TextInput name={`${name}.getListItems`}/></td>
-                                    </tr>
-                                    <tr>
-                                      <td className="text-right pr-1">List Item Schema</td>
-                                      <td className="pr-3"><TextInput name={`${name}.listItemSchema`}/></td>
-                                      <td className="text-right pr-1">Name Plural</td>
-                                      <td className="pr-3"><TextInput name={`${name}.namePlural`}/></td>
-                                      <td className="text-right pr-1">Name Field</td>
-                                      <td><TextInput name={`${name}.nameField`}/></td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                <FieldArray
-                                  name={`${name}.relationships`}
-                                  render={(props) => (
-                                    <>
-                                      <h5>Relationships <small className="text-muted">({props.fields.length})</small></h5>
-                                      {props.fields.length ? (
-                                        <table className="table table-sm mb-0">
-                                          <thead>
-                                            <tr>
-                                              <th><small>Resource ID</small></th>
-                                              <th><small>Field</small></th>
-                                              <th><small>Get ID</small></th>
-                                              <th><small>Many</small></th>
-                                              <th/>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            {props.fields.map((innerName, innerIndex) => (
-                                              <tr key={innerIndex}>
-                                                <td><TextInput name={`${innerName}.resourceId`} /></td>
-                                                <td><TextInput name={`${innerName}.field`} /></td>
-                                                <td><TextInput name={`${innerName}.getId`} /></td>
-                                                <td><CheckboxInput name={`${innerName}.many`} /></td>
-                                                <td className="text-right pr-1">
-                                                  <button
-                                                    className="btn btn-sm btn-link"
-                                                    type="button"
-                                                    onClick={() => props.fields.remove(innerIndex)}
-                                                  >
-                                                    <i className="zmdi zmdi-delete" />
-                                                  </button>
-                                                </td>
+                          {fields.map((name, index) => {
+                            const spec = form.getFieldState(`${name}.spec`);
+                            const innerOperationOptions = spec ? operationOptions[spec.value] : [];
+
+                            return (
+                              <div className="card mb-4 bg-light" key={index}>
+                                <div className="card-header d-flex">
+                                  <div className="flex-grow-1 mr-3"><TextInput name={`${name}.name`} label="Resource name" /></div>
+                                  <button
+                                    className="btn btn-sm btn-secondary"
+                                    type="button"
+                                    onClick={() => fields.remove(index)}
+                                  >
+                                    <i className="zmdi zmdi-delete" />
+                                  </button>
+                                </div>
+                                <div className="card-body">
+                                  <table className="mb-3 w-100">
+                                    <tbody>
+                                      <tr>
+                                        <td className="text-right pr-1">OpenAPI Spec</td>
+                                        <td className="pr-3"><Select options={specOptions} name={`${name}.spec`} /></td>
+                                        <td className="text-right pr-1">ID</td>
+                                        <td className="pr-3"><TextInput name={`${name}.id`} /></td>
+                                        <td className="text-right pr-1">ID Field</td>
+                                        <td><TextInput name={`${name}.idField`}/></td>
+                                      </tr>
+                                      <tr>
+                                        <td className="text-right pr-1">Create Operation</td>
+                                        <td className="pr-3"><Select options={innerOperationOptions} name={`${name}.createOperation`} /></td>
+                                        <td className="text-right pr-1">List Operation</td>
+                                        <td className="pr-3"><Select options={innerOperationOptions} name={`${name}.listOperation`} /></td>
+                                        <td className="text-right pr-1">Get Operation</td>
+                                        <td><Select options={innerOperationOptions} name={`${name}.getOperation`} /></td>
+                                      </tr>
+                                      <tr>
+                                        <td className="text-right pr-1">Delete Operation</td>
+                                        <td className="pr-3"><Select options={innerOperationOptions} name={`${name}.deleteOperation`} /></td>
+                                        <td className="text-right pr-1">Parameter Name</td>
+                                        <td className="pr-3"><TextInput name={`${name}.parameterName`}/></td>
+                                        <td className="text-right pr-1">Get List Items</td>
+                                        <td><TextInput name={`${name}.getListItems`}/></td>
+                                      </tr>
+                                      <tr>
+                                        <td className="text-right pr-1">List Item Schema</td>
+                                        <td className="pr-3"><TextInput name={`${name}.listItemSchema`}/></td>
+                                        <td className="text-right pr-1">Name Plural</td>
+                                        <td className="pr-3"><TextInput name={`${name}.namePlural`}/></td>
+                                        <td className="text-right pr-1">Name Field</td>
+                                        <td><TextInput name={`${name}.nameField`}/></td>
+                                      </tr>
+                                      <tr>
+                                        <td className="text-right pr-1">Get Detail Item</td>
+                                        <td><TextInput name={`${name}.getDetailItem`}/></td>
+                                        <td className="text-right pr-1">Detail Item Schema</td>
+                                        <td className="pr-3"><TextInput name={`${name}.detailItemSchema`}/></td>
+                                        <td className="text-right pr-1"/>
+                                        <td className="pr-3"/>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <FieldArray
+                                    name={`${name}.relationships`}
+                                    render={(props) => (
+                                      <>
+                                        <h5>Relationships <small className="text-muted">({props.fields.length})</small></h5>
+                                        {props.fields.length ? (
+                                          <table className="table table-sm mb-0">
+                                            <thead>
+                                              <tr>
+                                                <th><small>Resource ID</small></th>
+                                                <th><small>Field</small></th>
+                                                <th><small>Get ID</small></th>
+                                                <th><small>Many</small></th>
+                                                <th/>
                                               </tr>
-                                            ))}
-                                          </tbody>
-                                        </table>
-                                      ) : null}
-                                      <div className="text-right">
-                                        <button
-                                          className="btn btn-sm btn-link"
-                                          type="button"
-                                          onClick={() => props.fields.push({})}
-                                        >
-                                          <i className="zmdi zmdi-plus" /> Add Relationship
-                                        </button>
-                                      </div>
-                                    </>
-                                  )}
-                                />
+                                            </thead>
+                                            <tbody>
+                                              {props.fields.map((innerName, innerIndex) => (
+                                                <tr key={innerIndex}>
+                                                  <td><TextInput name={`${innerName}.resourceId`} /></td>
+                                                  <td><TextInput name={`${innerName}.field`} /></td>
+                                                  <td><TextInput name={`${innerName}.getId`} /></td>
+                                                  <td><CheckboxInput name={`${innerName}.many`} /></td>
+                                                  <td className="text-right pr-1">
+                                                    <button
+                                                      className="btn btn-sm btn-link"
+                                                      type="button"
+                                                      onClick={() => props.fields.remove(innerIndex)}
+                                                    >
+                                                      <i className="zmdi zmdi-delete" />
+                                                    </button>
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        ) : null}
+                                        <div className="text-right">
+                                          <button
+                                            className="btn btn-sm btn-link"
+                                            type="button"
+                                            onClick={() => props.fields.push({})}
+                                          >
+                                            <i className="zmdi zmdi-plus" /> Add Relationship
+                                          </button>
+                                        </div>
+                                      </>
+                                    )}
+                                  />
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            )
+                          })}
                           <button
                             className="btn btn-sm btn-secondary"
                             type="button"
@@ -220,7 +255,7 @@ export class ProjectForm extends React.Component<IProps, IState> {
                   {selectedTab === "advanced" && (
                     <>
                       <CodeInput name="initialize" label="Initialize function" mode="javascript" height={400} />
-                      <CodeInput name="signOut" label="Sign Out function" mode="javascript" height={200} />
+                      <CodeInput name="signOut" label="Sign out function" mode="javascript" height={200} />
                       <CodeInput name="addPageParams" label="Add page params function" mode="javascript" height={200} />
                       <CodeInput name="getTotalResults" label="Get total results function" mode="javascript" height={200} />
                     </>
@@ -235,6 +270,39 @@ export class ProjectForm extends React.Component<IProps, IState> {
         }}
       />
     );
+  }
+
+  private onSpecBlur = (form: FormApi) => {
+    const specs = form.getFieldState("specs");
+    if (specs && specs.value) {
+      this.setOperationOptions(specs.value as unknown as ISpecValue[]);
+    }
+  }
+
+  private setOperationOptions(specs: Array<{ id: string; spec: string }>) {
+    const operationOptions: { [id: string]: IOption[] } = {};
+    specs.forEach((spec: any) => {
+      try {
+        const resolved = resolveAllReferences(JSON.parse(spec.spec));
+        const operations = getOperations(resolved);
+        const options: IOption[] = [];
+        operations.forEach(operation => {
+          const operationId = operation.operation.operationId;
+          if (operationId) {
+            options.push({ label: operationId, value: operationId })
+          }
+        });
+        options.unshift({
+          label: "None",
+          value: ""
+        });
+        operationOptions[spec.id] = options;
+      } catch (e) {
+        console.warn(e);
+      }
+    });
+
+    this.setState({ operationOptions });
   }
 
   private renderNavItem(label: React.ReactNode, id: tabIds): React.ReactNode {

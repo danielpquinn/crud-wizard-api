@@ -47,33 +47,11 @@ class NestedParamForm extends React.Component<INestedParamFormProps, INestedPara
     };
   }
 
-  public componentDidMount() {
-    const { schema } = this.props;
-    const properties = schema.properties;
-  
-    if (properties) {
-      let numFields = 0;
-      
-      for (const key in properties) {
-        if (!properties[key].properties && !(properties[key] as BodyParameter).schema) {
-          numFields += 1;
-        }
-      }
-
-      let numCols = 1;
-      
-      if (this.myRef && this.myRef.current) {
-        numCols = getNumColumns(this.myRef.current.clientWidth, maxFormColumnWidth, numFields);
-      }
-
-      this.setState({ numCols });
-    }
-  }
-
   public render(): React.ReactNode {
     const { formState, onChange, path, schema } = this.props;
-    const { numCols, open } = this.state;
+    const { open } = this.state;
     const properties = schema.properties;
+    let numFields = 0;
   
     if (properties) {
       const fieldKeys = [];
@@ -82,9 +60,17 @@ class NestedParamForm extends React.Component<INestedParamFormProps, INestedPara
       for (const key in properties) {
         if (properties[key].properties || (properties[key] as BodyParameter).schema) {
           nestedFormKeys.push(key);
+          numFields += 1;
         } else {
           fieldKeys.push(key);
+          numFields += 1;
         }
+      }
+
+      let numCols = 1;
+      
+      if (this.myRef && this.myRef.current) {
+        numCols = getNumColumns(this.myRef.current.clientWidth, maxFormColumnWidth, numFields);
       }
 
       const fieldRows: React.ReactNode[][] = [];

@@ -22,6 +22,24 @@ export interface IOperationObjectWithPathAndMethod {
   operation: Operation;
 }
 
+export const getOperations = (spec: Spec): IOperationObjectWithPathAndMethod[] => {
+  const result = [];
+  for (const path in spec.paths) {
+    if (spec.paths[path]) {
+      for (const method in spec.paths[path]) {
+        if (spec.paths[path]) {
+          result.push({
+            method,
+            operation: spec.paths[path][method],
+            path
+          });
+        }
+      }
+    }
+  }
+  return result;
+}
+
 export const findOperationObject = (spec: Spec, operationId: string): IOperationObjectWithPathAndMethod | null => {
   for (const path in spec.paths) {
     if (spec.paths[path]) {

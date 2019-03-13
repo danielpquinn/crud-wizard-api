@@ -41,7 +41,7 @@ export class Header extends React.Component<{}, IState> {
     return (
       <header className="navbar p-0 border-0 navbar-expand-lg bg-light">
         <button
-          className="btn-link navbar-toggler mr-auto d-block"
+          className="btn-link navbar-toggler d-block"
           type="button"
           aria-controls="navbarNavDropdown"
           aria-label="Toggle navigation"
@@ -49,6 +49,7 @@ export class Header extends React.Component<{}, IState> {
         >
           <i className="zmdi zmdi-menu"/>
         </button>
+        <span className="navbar-brand mr-auto">{project.name}</span>
         <ul className="navbar-nav">
           <li className={`nav-item dropdown ${settingsOpen ? "show" : ""}`}>
             <a

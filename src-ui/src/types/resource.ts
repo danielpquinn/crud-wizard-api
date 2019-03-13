@@ -10,9 +10,11 @@ export interface IRelationship {
 export interface IResource {
   createOperation?: string;
   deleteOperation?: string;
+  detailItemSchema?: string;
   getOperation: string;
   id: string;
   idField: string;
+  getDetailItem?: (response: AxiosResponse) => any[];
   getListItems?: (response: AxiosResponse) => any[];
   listItemSchema?: string;
   listOperation: string;

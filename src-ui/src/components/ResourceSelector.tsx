@@ -50,7 +50,7 @@ export class ResourceSelector extends React.Component<IProps, IState> {
 
     // tslint:disable:jsx-no-lambda
     const modal = (
-      <Window top={0} left={0} width={400} height={600} onClose={this.closeModal}>
+      <Window top={0} left={0} opacity={1} width={400} height={600} onClose={this.closeModal}>
         <ParamForm onChange={this.onParamFormChange} operation={this.resource.listOperation} resource={this.resource} />
         <select className="form-control" onChange={(e) => onChange(e.target.value)} value={value}>
           {this.state.options.map((option: IOption, i: number) => {

@@ -70,6 +70,7 @@ export class Desktop extends React.Component<IProps, IState> {
                 width={window.width}
                 height={window.height}
                 key={windowId}
+                opacity={window.opacity}
                 onDragStart={() => {
                   getWindowManager().moveToFront(windowId);
                 }}
@@ -93,7 +94,7 @@ export class Desktop extends React.Component<IProps, IState> {
                   getTweenManager().addTween(innerWindow, "left", 0);
                   getTweenManager().addTween(innerWindow, "top", headerHeight);
                   getTweenManager().addTween(innerWindow, "width", innerWidth);
-                  getTweenManager().addTween(innerWindow, "height", innerHeight, {
+                  getTweenManager().addTween(innerWindow, "height", innerHeight - headerHeight, {
                     onStep: () => {
                       getWindowManager().updateWindow(windowId, {});
                     },

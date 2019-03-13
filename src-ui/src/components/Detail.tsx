@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { startCase } from "lodash";
+import { get, startCase } from "lodash";
 import * as React from "react";
 import { Alert } from "src/components/Alert";
 import { Button } from "src/components/Button";
@@ -73,11 +73,17 @@ export class Detail extends React.Component<IProps, IState> {
 
     const properties = this.schema && this.schema.properties;
 
+    let data = axiosResponse.data;
+
+    if (this.resource && this.resource.getDetailItem) {
+      data = this.resource.getDetailItem(axiosResponse);
+    }
+
     // tslint:disable:jsx-no-lambda
 
     return this.resource && axiosResponse && properties ? (
       <div>
-        <h4>{this.resource.name} - {axiosResponse.data[this.resource.nameField]}</h4>
+        <h4>{this.resource.name} - {data[this.resource.nameField]}</h4>
         <hr/>
         <div className="row">
           <div className="col">
@@ -119,7 +125,7 @@ export class Detail extends React.Component<IProps, IState> {
         <table className="table table-sm">
           <tbody>
             {Object.keys(properties).map((key, i) => {
-              const value = axiosResponse.data[key];
+              const value = data[key];
               const primitive = ["string", "number", "boolean", "undefined"].indexOf(typeof value) >= 0;
               return (
                 <tr key={i}>
@@ -157,7 +163,12 @@ export class Detail extends React.Component<IProps, IState> {
     }
 
     const responses = this.operation.operation.responses;
-    this.schema = ((responses["200"] || responses.default) as Response).schema;
+
+    if (this.resource.detailItemSchema) {
+      this.schema = get(getProjectManager().getResolvedSpec(spec), this.resource.detailItemSchema.split("/"));
+    } else {
+      this.schema = ((responses["200"] || responses.default) as Response).schema;
+    }
     
     if (!this.schema || !this.schema.properties) {
       return `GET operation for resource ${resourceId} does not have an properties \`schema\` field for it's 200 response, cannot render detail view. Please make sure your resources.ts file is correct`;

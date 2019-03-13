@@ -38,6 +38,7 @@ class ProjectManager {
 
     for (const resource of this.project.resources) {
       this.evalField(resource, "getListItems");
+      this.evalField(resource, "getDetailItem");
     }
 
     if (this.project.initialize) {

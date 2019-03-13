@@ -6,6 +6,7 @@ interface IProps {
   active?: boolean;
   height?: number;
   left: number;
+  opacity: number;
   onClose?: (e: React.MouseEvent<HTMLButtonElement>) => any;
   onDrag?: (top: number, left: number) => any;
   onMaximize?: (e: React.MouseEvent<HTMLButtonElement>) => any;
@@ -39,7 +40,8 @@ export class Window extends React.Component<IProps, {}> {
       onMinimize,
       onMaximize,
       top,
-      width = defaultWindowWidth
+      width = defaultWindowWidth,
+      opacity 
     } = this.props;
 
     return (
@@ -47,7 +49,7 @@ export class Window extends React.Component<IProps, {}> {
         className={`modal ${active ? "active" : ""}`}
         tabIndex={-1}
         role="dialog"
-        style={{ left: `${left}px`, top: `${top}px` }}
+        style={{ left: `${left}px`, top: `${top}px`, opacity }}
       >
         <div className="modal-dialog" role="document" style={{ width: `${width}px` }}>
           <div className="modal-content">

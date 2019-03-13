@@ -28,6 +28,29 @@ export class Select extends React.Component<IProps> {
                 container: (provided) => ({ ...provided, width: "100%" }),
                 control: (provided) => ({ ...provided, minHeight: "31px", height: "31px" })
               }}
+              theme={(theme) => ({
+                ...theme,
+                colors: {
+                  ...theme.colors,
+                  primary: "#00FAF2",
+                  primary75: "rgba(0, 250, 242, 0.75)",
+                  primary50: "rgba(0, 250, 242, 0.5)",
+                  primary25: "rgba(0, 250, 242, 0.25)",
+                  danger: "#EF2706",
+                  dangerLight: "#FF5A0C",
+                  neutral0: "#12141D",
+                  neutral5: "#111E29",
+                  neutral10: "#122B3A",
+                  neutral20: "#123748",
+                  neutral30: "#124155",
+                  neutral40: "#2E5B6D",
+                  neutral50: "#4F7585",
+                  neutral60: "#7896A2",
+                  neutral70: "#A5BAC1",
+                  neutral80: "#C8D6DA",
+                  neutral90: "#EFF5F5"
+                }
+              })}
               options={options}
               value={{ value: input.value, label: input.value }}
               onChange={(option: IOption) => input.onChange(option.value)}
