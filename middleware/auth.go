@@ -5,8 +5,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	"github.com/danielpquinn/crud-wizard-projects/lib"
-	"github.com/danielpquinn/crud-wizard-projects/models"
+	"github.com/danielpquinn/crud-wizard-api/lib"
+	"github.com/danielpquinn/crud-wizard-api/models"
 	"github.com/gin-gonic/gin"
 )
 

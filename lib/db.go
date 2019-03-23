@@ -3,7 +3,7 @@ package lib
 import (
 	"os"
 
-	"github.com/danielpquinn/crud-wizard-projects/models"
+	"github.com/danielpquinn/crud-wizard-api/models"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/validations"
 )
@@ -15,6 +15,11 @@ var Database *gorm.DB
 func InitializeDatabase() {
 	var err error
 	connectionString := os.Getenv("POSTGRESS_CONNECTION_STRING")
+
+	if connectionString == "" {
+		connectionString = "user=crudwizard password=crudwizard dbname=crudwizard sslmode=disable"
+	}
+
 	Database, err = gorm.Open("postgres", connectionString)
 
 	if err != nil {

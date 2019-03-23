@@ -8,8 +8,8 @@ import (
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/danielpquinn/crud-wizard-projects/lib"
-	"github.com/danielpquinn/crud-wizard-projects/models"
+	"github.com/danielpquinn/crud-wizard-api/lib"
+	"github.com/danielpquinn/crud-wizard-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -162,6 +162,7 @@ func UpdateProject(c *gin.Context) {
 		project.Initialize = input.Initialize
 		project.GetTotalResults = input.GetTotalResults
 		project.AddPageParams = input.AddPageParams
+		project.SignOut = input.SignOut
 
 		lib.Database.Save(&project)
 

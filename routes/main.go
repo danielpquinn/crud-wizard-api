@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/danielpquinn/crud-wizard-projects/middleware"
+	"github.com/danielpquinn/crud-wizard-api/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"

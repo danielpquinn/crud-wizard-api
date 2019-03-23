@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/danielpquinn/crud-wizard-projects/lib"
-	"github.com/danielpquinn/crud-wizard-projects/routes"
+	"github.com/danielpquinn/crud-wizard-api/lib"
+	"github.com/danielpquinn/crud-wizard-api/routes"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
