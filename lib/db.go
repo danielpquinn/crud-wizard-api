@@ -14,7 +14,7 @@ var Database *gorm.DB
 // InitializeDatabase -  database connection, configure and perform migrations
 func InitializeDatabase() {
 	var err error
-	connectionString := os.Getenv("POSTGRESS_CONNECTION_STRING")
+	connectionString := os.Getenv("POSTGRES_CONNECTION_STRING")
 
 	if connectionString == "" {
 		connectionString = "user=crudwizard password=crudwizard dbname=crudwizard sslmode=disable"
