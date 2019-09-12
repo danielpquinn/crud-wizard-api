@@ -34,6 +34,7 @@ var ResourcesSchemaLoader = gojsonschema.NewStringLoader(`{
 			"id": { "type": "string" },
 			"idField": { "type": "string" },
 			"getDetailItem": { "type": "string" },
+			"getUpdateFormDefaults": { "type": "string" },
 			"getListItems": { "type": "string" },
 			"listItemSchema": { "type": "string" },
 			"detailItemSchema": { "type": "string" },
@@ -55,7 +56,8 @@ var ResourcesSchemaLoader = gojsonschema.NewStringLoader(`{
 					},
 					"required": ["resourceId", "field" ]
 				}
-			}
+			},
+			"updateOperation": { "type": "string" }
 		},
 		"required": ["id", "name", "nameField", "namePlural", "listOperation"],
 		"additionalProperties": false
