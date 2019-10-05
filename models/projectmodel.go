@@ -14,10 +14,10 @@ type (
 		Name            string          `json:"name" valid:"length(3|255)"`
 		Specs           json.RawMessage `json:"specs" valid:"required"`
 		Resources       json.RawMessage `json:"resources" valid:"required"`
-		Initialize      string          `json:"initialize" valid:"required"`
+		Initialize      string          `json:"initialize"`
 		SignOut         string          `json:"signOut"`
-		GetTotalResults string          `json:"getTotalResults" valid:"required"`
-		AddPageParams   string          `json:"addPageParams" valid:"required"`
+		GetTotalResults string          `json:"getTotalResults"`
+		AddPageParams   string          `json:"addPageParams"`
 		UserID          uuid.UUID       `gorm:"type:uuid" json:"userId"`
 	}
 )
